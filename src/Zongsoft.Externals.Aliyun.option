@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<options>
+	<option path="/Externals/Aliyun">
+		<!-- 阿里云的标准配置项：name 属性表示服务中心的名称；internal 属性为真(true)表示以内网地址访问，为假(false)表示以外网地址访问。 -->
+		<general general.type="Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration, Zongsoft.Externals.Aliyun"
+		         name="Hangzhou|Shenzhen|Qingdao|Beijing|Hongkong" internal="false">
+
+			<!-- 阿里云的凭证配置：name 属性表示凭证的ID值；secret 属性表示凭证的密钥。 -->
+			<certification name="Your Access Key Id" secret="Your Access Key Secret" />
+
+			<!-- 消息队列的配置项：name 属性表示消息队列的所有者帐号。 -->
+			<messaging name="Your Account Name of The MQS(Message Queue Service)" />
+		</general>
+	</option>
+</options>

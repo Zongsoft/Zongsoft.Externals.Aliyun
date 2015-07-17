@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<plugin name="Zongsoft.Externals.Aliyun"
+        title="Zongsoft.Externals.Aliyun Plugin"
+        author="Zongsoft Corporation"
+        version="1.0"
+        description="Create by: Popeye Zhong at 2015-06-16" >
+
+	<manifest>
+		<assemblies>
+			<assembly name="Zongsoft.Externals.Aliyun" />
+		</assemblies>
+	</manifest>
+
+	<extension path="/Workbench/FileSystem">
+		<object name="Aliyun-OSS" option="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
+	</extension>
+
+	<extension path="/Workspace/Externals/Aliyun">
+		<object name="MessageQueueProvider" option="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
+	</extension>
+
+	<extension path="/Workspace/Services">
+		<object name="MessageQueueProvider" value="{path:/Workspace/Externals/Aliyun/MessageQueueProvider}" />
+	</extension>
+</plugin>
