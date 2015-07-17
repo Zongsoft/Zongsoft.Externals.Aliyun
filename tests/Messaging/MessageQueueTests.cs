@@ -84,6 +84,18 @@ namespace Zongsoft.Externals.Aliyun.Tests.Messaging
 			if(message != null)
 				await message.AcknowledgeAsync(60);
 		}
+
+		[Xunit.Fact]
+		public async Task PeekAsyncTest()
+		{
+			var queue = (MessageQueue)_provider.GetQueue(EXISTS_QUEUE_NAME);
+			Assert.NotNull(queue);
+
+			var message = await queue.PeekAsync();
+
+			if(message != null)
+				Assert.NotNull(message.Id);
+		}
 		#endregion
 	}
 }
