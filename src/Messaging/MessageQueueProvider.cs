@@ -84,6 +84,17 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				_option = value;
 			}
 		}
+
+		public MessageQueue this[string name]
+		{
+			get
+			{
+				if(string.IsNullOrWhiteSpace(name))
+					throw new ArgumentNullException("name");
+
+				return _queues.GetOrAdd(name, key => new MessageQueue(this, name));
+			}
+		}
 		#endregion
 
 		#region 公共方法

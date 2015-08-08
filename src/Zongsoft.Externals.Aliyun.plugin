@@ -16,11 +16,11 @@
 		<object name="Aliyun-OSS" option="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
 	</extension>
 
-	<extension path="/Workspace/Externals/Aliyun">
-		<object name="MessageQueueProvider" option="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
+	<extension path="/Workspace/Messaging">
+		<object name="Queues" option="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
 	</extension>
 
 	<extension path="/Workspace/Services">
-		<object name="MessageQueueProvider" value="{path:/Workspace/Externals/Aliyun/MessageQueueProvider}" />
+		<object name="MessageQueueProvider" value="{path:/Workspace/Messaging/Queues}" />
 	</extension>
 </plugin>
