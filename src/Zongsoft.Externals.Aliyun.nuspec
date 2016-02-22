@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl-2.1.html</licenseUrl>
+    <projectUrl>https://github.com/Zongsoft/Zongsoft.Externals.Aliyun</projectUrl>
+    <iconUrl>https://avatars.githubusercontent.com/u/4804332</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>$description$</description>
+    <summary>关于阿里云服务的扩展开发包。</summary>
+    <releaseNotes>关于阿里云服务的扩展开发包。</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Zongsoft External Aliyun OSS Message Queue MQS</tags>
+    <dependencies>
+        <dependency id="Zongsoft.CoreLibrary" version="4.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Zongsoft.Externals.Aliyun.option" target="content\plugins\Zongsoft.Externals\Aliyun\" />
+    <file src="Zongsoft.Externals.Aliyun.plugin" target="content\plugins\Zongsoft.Externals\Aliyun\" />
+    <file src="bin\$configuration$\Zongsoft.Externals.Aliyun.dll" target="content\plugins\Zongsoft.Externals\Aliyun\" />
+  </files>
+</package>

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Zongsoft.Externals.Aliyun")]
-[assembly: AssemblyDescription("Zongsoft Externals Library for Aliyun")]
+[assembly: AssemblyDescription("This is a library about Aliyun SDK.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Zongsoft Corporation")]
 [assembly: AssemblyProduct("Zongsoft.Externals.Aliyun Library")]
@@ -12,5 +12,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("1.0.1506.*")]
+[assembly: AssemblyVersion("1.0.1506.0")]
 [assembly: AssemblyFileVersion("1.0.1506.0")]
