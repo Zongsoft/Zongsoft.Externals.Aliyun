@@ -60,9 +60,9 @@ namespace Zongsoft.Externals.Aliyun.Storages
 
 		#region 公共属性
 		/// <summary>
-		/// 获取文件目录系统的模式，返回“zfs.oss”。
+		/// 获取文件目录系统的方案，始终返回“zfs.oss”。
 		/// </summary>
-		public string Schema
+		public string Scheme
 		{
 			get
 			{
