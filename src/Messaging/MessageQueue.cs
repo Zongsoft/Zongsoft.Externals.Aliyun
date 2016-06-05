@@ -128,6 +128,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 
 				if(!response.IsSuccessStatusCode)
 				{
+					Zongsoft.Diagnostics.Logger.Warn("[" + response.StatusCode + "] The message enqueue failed.", await response.Content.ReadAsStringAsync());
 					return count;
 				}
 
