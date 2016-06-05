@@ -213,6 +213,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		{
 			var client = this.CreateHttpClient();
 			var request = new HttpRequestMessage(HttpMethod.Get, this.GetRequestUrl("messages") + (waitSeconds >= 0 ? "?waitseconds=" + waitSeconds.ToString() : "?peekonly=true"));
+			request.Headers.Add("x-mns-version", "2015-06-06");
 			var response = await client.SendAsync(request);
 
 			if(response.IsSuccessStatusCode)

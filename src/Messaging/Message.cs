@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -63,7 +63,9 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				return false;
 
 			var client = _queue.CreateHttpClient();
-			var response = await client.DeleteAsync(_queue.GetRequestUrl("messages") + "?ReceiptHandle=" + Uri.EscapeDataString(this.AcknowledgementId));
+			var request = new HttpRequestMessage(HttpMethod.Delete, _queue.GetRequestUrl("messages") + "?ReceiptHandle=" + Uri.EscapeDataString(this.AcknowledgementId));
+			request.Headers.Add("x-mns-version", "2015-06-06");
+			var response = await client.SendAsync(request);
 			return response.IsSuccessStatusCode;
 		}
 
@@ -73,7 +75,9 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				return this.Expires;
 
 			var client = _queue.CreateHttpClient();
-			var response = await client.PutAsync(_queue.GetRequestUrl("messages") + "?ReceiptHandle=" + Uri.EscapeDataString(this.AcknowledgementId) + "&VisibilityTimeout=" + duration.TotalSeconds.ToString(), null);
+			var request = new HttpRequestMessage(HttpMethod.Put, _queue.GetRequestUrl("messages") + "?ReceiptHandle=" + Uri.EscapeDataString(this.AcknowledgementId) + "&VisibilityTimeout=" + duration.TotalSeconds.ToString());
+			request.Headers.Add("x-mns-version", "2015-06-06");
+			var response = await client.SendAsync(request);
 
 			if(!response.IsSuccessStatusCode)
 			{
