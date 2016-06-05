@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -27,19 +27,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
 
 namespace Zongsoft.Externals.Aliyun.Messaging
 {
 	internal class MessageQueueAuthenticator : HttpAuthenticator
 	{
 		#region 单例字段
-		public static MessageQueueAuthenticator Instance = new MessageQueueAuthenticator("MQS");
+		public static MessageQueueAuthenticator Instance = new MessageQueueAuthenticator("MNS");
 		#endregion
 
 		#region 私有构造
@@ -51,7 +46,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#region 重写方法
 		protected override bool IsCanonicalizedHeader(string name)
 		{
-			return name.StartsWith("x-mqs-");
+			return name.StartsWith("x-mns-");
 		}
 
 		protected override string CanonicalizeResource(HttpRequestMessage request)

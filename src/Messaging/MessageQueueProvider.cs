@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -34,7 +34,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 	{
 		#region 成员字段
 		private ConcurrentDictionary<string, MessageQueue> _queues;
-		private Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration _option;
+		private Options.Configuration.GeneralConfiguration _option;
 		#endregion
 
 		#region 构造函数
@@ -111,9 +111,9 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			var path = parts == null ? string.Empty : string.Join("/", parts);
 
 			if(string.IsNullOrEmpty(path))
-				return string.Format("http://{0}.{1}", this.GetAccountName(), this.ServiceCenter.Path);
+				return string.Format("http://{0}.{1}/queues", this.GetAccountName(), this.ServiceCenter.Path);
 			else
-				return string.Format("http://{0}.{1}/{2}", this.GetAccountName(), this.ServiceCenter.Path, path);
+				return string.Format("http://{0}.{1}/queues/{2}", this.GetAccountName(), this.ServiceCenter.Path, path);
 		}
 		#endregion
 

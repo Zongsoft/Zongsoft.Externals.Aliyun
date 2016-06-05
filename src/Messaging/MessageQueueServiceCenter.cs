@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -36,10 +36,10 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 	{
 		#region 常量定义
 		//中国存储服务中心访问地址的前缀常量
-		private const string OSS_CN_PREFIX = "mqs-cn-";
+		private const string OSS_CN_PREFIX = "mns.cn-";
 
 		//美国存储服务中心访问地址的前缀常量
-		private const string OSS_US_PREFIX = "mqs-us-";
+		private const string OSS_US_PREFIX = "mns.us-";
 		#endregion
 
 		#region 构造函数

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2016 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -122,13 +122,13 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 
 				var request = new HttpRequestMessage(HttpMethod.Post, this.GetRequestUrl("messages"));
 				request.Content = new StringContent(text, Encoding.UTF8, "text/xml");
-				request.Headers.Add("x-mqs-version", "2015-06-06");
+				request.Headers.Add("x-mns-version", "2015-06-06");
 
 				var response = await client.SendAsync(request);
 
 				if(!response.IsSuccessStatusCode)
 				{
-					Zongsoft.Diagnostics.Logger.Warn("[" + response.StatusCode + "] The message enqueue failed.", await response.Content.ReadAsStringAsync());
+					Zongsoft.Diagnostics.Logger.Warn("[" + response.StatusCode + "] The message enqueue failed." + Environment.NewLine + await response.Content.ReadAsStringAsync());
 					return count;
 				}
 
