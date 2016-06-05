@@ -122,11 +122,14 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 
 				var request = new HttpRequestMessage(HttpMethod.Post, this.GetRequestUrl("messages"));
 				request.Content = new StringContent(text, Encoding.UTF8, "text/xml");
+				request.Headers.Add("x-mqs-version", "2015-06-06");
 
 				var response = await client.SendAsync(request);
 
 				if(!response.IsSuccessStatusCode)
+				{
 					return count;
+				}
 
 				count++;
 			}
