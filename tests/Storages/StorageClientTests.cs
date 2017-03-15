@@ -30,7 +30,7 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		public StorageClientTests()
 		{
 			var configuration = Zongsoft.Options.Configuration.OptionConfiguration.Load(@"\Zongsoft\Zongsoft.Externals.Aliyun\src\Zongsoft.Externals.Aliyun.option");
-			var option = configuration.GetOptionObject("Externals/Aliyun/General") as Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration;
+			var option = configuration.GetOptionValue("Externals/Aliyun/General") as Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration;
 
 			_client = StorageServiceCenter.GetInstance(option.Name, option.IsInternal).Client;
 			_client.Certification = option.Certification;
