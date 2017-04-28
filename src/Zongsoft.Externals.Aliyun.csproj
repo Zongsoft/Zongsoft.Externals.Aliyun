@@ -50,6 +50,13 @@
     <Compile Include="Messaging\MessageQueueProvider.cs" />
     <Compile Include="Messaging\MessageQueueServiceCenter.cs" />
     <Compile Include="Messaging\MessageUtility.cs" />
+    <Compile Include="Notification\NotificationSenderSettings.cs" />
+    <Compile Include="Notification\NotificationType.cs" />
+    <Compile Include="Notification\NotificationDeviceType.cs" />
+    <Compile Include="Notification\NotificationResult.cs" />
+    <Compile Include="Notification\NotificationSendCommand.cs" />
+    <Compile Include="Notification\NotificationSender.cs" />
+    <Compile Include="Notification\NotificationTargetType.cs" />
     <Compile Include="Options\Configuration\CertificationConfigurationElement.cs" />
     <Compile Include="Options\Configuration\GeneralConfiguration.cs" />
     <Compile Include="Options\Configuration\MessagingConfigurationElement.cs" />
@@ -77,7 +84,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Storages\Commands\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

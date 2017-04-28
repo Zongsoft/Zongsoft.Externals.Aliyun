@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -25,22 +25,42 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Storages
+namespace Zongsoft.Externals.Aliyun.Notification
 {
-	internal class StorageHeaders
+	public class NotificationResult
 	{
-		public const string OSS_PREFIX = "x-oss-";
-		public const string OSS_META = OSS_PREFIX + "meta-";
-		public const string OSS_COPY_SOURCE = OSS_PREFIX + "copy-source";
-		public const string OSS_COPY_DIRECTIVE = OSS_PREFIX + "metadata-directive";
+		public string RequestId
+		{
+			get;
+			set;
+		}
 
-		//自定义扩展属性常量
-		public const string ZFS_CREATEDTIME_PROPERTY = "CreatedTime";
+		public string MessageId
+		{
+			get;
+			set;
+		}
 
-		//标准的HTTP头的常量
-		public const string HTTP_ETAG_PROPERTY = "HTTP:ETag";
-		public const string HTTP_CONTENT_LENGTH_PROPERTY = "HTTP:Content-Length";
-		public const string HTTP_LAST_MODIFIED_PROPERTY = "HTTP:Last-Modified";
+		public string Code
+		{
+			get;
+			set;
+		}
+
+		public string Message
+		{
+			get;
+			set;
+		}
+
+		public bool IsSucceed
+		{
+			get
+			{
+				return string.IsNullOrWhiteSpace(this.Code);
+			}
+		}
 	}
 }
