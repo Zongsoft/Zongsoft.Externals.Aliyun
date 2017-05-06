@@ -25,14 +25,8 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
 
 namespace Zongsoft.Externals.Aliyun.Storages
 {
@@ -51,7 +45,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		#endregion
 
 		#region 私有构造
-		private StorageAuthenticator(string name) : base(name)
+		private StorageAuthenticator(string name) : base(name, HttpSignatureMode.Header)
 		{
 		}
 		#endregion

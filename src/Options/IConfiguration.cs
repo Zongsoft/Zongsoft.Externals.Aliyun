@@ -26,12 +26,27 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Options
 {
-	public enum NotificationDeviceType
+	/// <summary>
+	/// 表示阿里云的配置接口。
+	/// </summary>
+	public interface IConfiguration
 	{
-		All,
-		Android,
-		iOS,
+		/// <summary>
+		/// 获取配置的服务中心。
+		/// </summary>
+		ServiceCenterName Name
+		{
+			get;
+		}
+
+		/// <summary>
+		/// 获取配置的凭证对象。
+		/// </summary>
+		ICertification Certification
+		{
+			get;
+		}
 	}
 }

@@ -26,12 +26,17 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun
 {
-	public enum NotificationDeviceType
+	/// <summary>
+	/// 表示验证签名的方式。
+	/// </summary>
+	public enum HttpSignatureMode
 	{
-		All,
-		Android,
-		iOS,
+		/// <summary>签名位于Http请求的头。</summary>
+		Header,
+
+		/// <summary>签名位于Http请求的查询参数。</summary>
+		Parameter,
 	}
 }

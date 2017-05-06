@@ -38,7 +38,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#endregion
 
 		#region 私有构造
-		private MessageQueueAuthenticator(string name) : base(name)
+		private MessageQueueAuthenticator(string name) : base(name, HttpSignatureMode.Header)
 		{
 		}
 		#endregion

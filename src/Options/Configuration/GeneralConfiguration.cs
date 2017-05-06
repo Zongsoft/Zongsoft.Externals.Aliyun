@@ -32,7 +32,7 @@ using Zongsoft.Options.Configuration;
 
 namespace Zongsoft.Externals.Aliyun.Options.Configuration
 {
-	public class GeneralConfiguration : OptionConfigurationElement
+	public class GeneralConfiguration : OptionConfigurationElement, IConfiguration
 	{
 		#region 常量定义
 		private const string XML_NAME_ATTRIBUTE = "name";
@@ -69,12 +69,12 @@ namespace Zongsoft.Externals.Aliyun.Options.Configuration
 			}
 		}
 
-		[OptionConfigurationProperty(XML_CERTIFICATION_ELEMENT)]
-		public CertificationConfigurationElement Certification
+		[OptionConfigurationProperty(XML_CERTIFICATION_ELEMENT, Type = typeof(CertificationConfigurationElement))]
+		public ICertification Certification
 		{
 			get
 			{
-				return (CertificationConfigurationElement)this[XML_CERTIFICATION_ELEMENT];
+				return (ICertification)this[XML_CERTIFICATION_ELEMENT];
 			}
 		}
 

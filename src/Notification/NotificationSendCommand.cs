@@ -32,6 +32,7 @@ using Zongsoft.Resources;
 
 namespace Zongsoft.Externals.Aliyun.Notification
 {
+	[CommandOption("Name", typeof(string), null, "")]
 	[CommandOption("Type", typeof(NotificationType), NotificationType.Message, "")]
 	[CommandOption("DeviceType", typeof(NotificationDeviceType), NotificationDeviceType.Android, "")]
 	[CommandOption("TargetType", typeof(NotificationTargetType), NotificationTargetType.Alias, "")]
@@ -40,6 +41,16 @@ namespace Zongsoft.Externals.Aliyun.Notification
 	{
 		#region 成员字段
 		private NotificationSender _sender;
+		#endregion
+
+		#region 构造函数
+		public NotificationSendCommand() : base("Send")
+		{
+		}
+
+		public NotificationSendCommand(string name) : base(name)
+		{
+		}
 		#endregion
 
 		#region 公共属性
@@ -78,7 +89,7 @@ namespace Zongsoft.Externals.Aliyun.Notification
 
 			foreach(var argument in context.Expression.Arguments)
 			{
-				var result = _sender.Send(argument, destination, settings);
+				var result = Utility.ExecuteTask(() => _sender.Send(context.Expression.Options.GetValue<string>("name"), argument, destination, settings));
 
 				if(result != null)
 				{

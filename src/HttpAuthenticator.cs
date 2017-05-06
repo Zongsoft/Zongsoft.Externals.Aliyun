@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -27,11 +27,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
 
 namespace Zongsoft.Externals.Aliyun
@@ -44,15 +42,17 @@ namespace Zongsoft.Externals.Aliyun
 
 		#region 成员字段
 		private string _name;
+		private HttpSignatureMode _signatureMode;
 		#endregion
 
 		#region 构造函数
-		protected HttpAuthenticator(string name)
+		protected HttpAuthenticator(string name, HttpSignatureMode signatureMode)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException("name");
 
 			_name = name.Trim();
+			_signatureMode = signatureMode;
 		}
 		#endregion
 
@@ -64,10 +64,18 @@ namespace Zongsoft.Externals.Aliyun
 				return _name;
 			}
 		}
+
+		public HttpSignatureMode SignatureMode
+		{
+			get
+			{
+				return _signatureMode;
+			}
+		}
 		#endregion
 
 		#region 公共方法
-		public string Signature(HttpRequestMessage request, string secret)
+		public virtual string Signature(HttpRequestMessage request, string secret)
 		{
 			using(var algorithm = HMACSHA1.Create())
 			{
@@ -77,14 +85,14 @@ namespace Zongsoft.Externals.Aliyun
 				//计算当前请求的签名数据
 				var data = Encoding.UTF8.GetBytes(Canonicalize(request));
 
-				//返回加密后的散列值
+				//计算加密后的散列值（签名内容）
 				return System.Convert.ToBase64String(algorithm.ComputeHash(data));
 			}
 		}
 		#endregion
 
 		#region 虚拟方法
-		private string Canonicalize(HttpRequestMessage request)
+		protected virtual string Canonicalize(HttpRequestMessage request)
 		{
 			if(request == null)
 				throw new ArgumentNullException("request");

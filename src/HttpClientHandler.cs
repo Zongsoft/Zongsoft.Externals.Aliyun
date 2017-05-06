@@ -25,7 +25,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
@@ -58,7 +57,24 @@ namespace Zongsoft.Externals.Aliyun
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			request.Headers.Date = DateTime.UtcNow;
-			request.Headers.Authorization = new AuthenticationHeaderValue(_authenticator.Name, _certification.Name + ":" + _authenticator.Signature(request, _certification.Secret));
+
+			switch(_authenticator.SignatureMode)
+			{
+				case HttpSignatureMode.Header:
+					request.Headers.Authorization = new AuthenticationHeaderValue(_authenticator.Name, _certification.Name + ":" + _authenticator.Signature(request, _certification.Secret));
+					break;
+				case HttpSignatureMode.Parameter:
+					var delimiter = string.IsNullOrWhiteSpace(request.RequestUri.Query) ? "?" : "&";
+
+					request.RequestUri = new Uri(
+						request.RequestUri.Scheme + "://" +
+						request.RequestUri.Authority +
+						request.RequestUri.PathAndQuery + delimiter +
+						_authenticator.Name + "="  + _authenticator.Signature(request, _certification.Secret) +
+						request.RequestUri.Fragment);
+
+					break;
+			}
 
 			return base.SendAsync(request, cancellationToken);
 		}

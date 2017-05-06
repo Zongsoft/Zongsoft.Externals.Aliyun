@@ -43,6 +43,7 @@
     <Compile Include="AliyunException.cs" />
     <Compile Include="HttpAuthenticator.cs" />
     <Compile Include="HttpClientHandler.cs" />
+    <Compile Include="HttpSignatureMode.cs" />
     <Compile Include="ICertification.cs" />
     <Compile Include="Messaging\Message.cs" />
     <Compile Include="Messaging\MessageQueue.cs" />
@@ -50,7 +51,9 @@
     <Compile Include="Messaging\MessageQueueProvider.cs" />
     <Compile Include="Messaging\MessageQueueServiceCenter.cs" />
     <Compile Include="Messaging\MessageUtility.cs" />
+    <Compile Include="Notification\NotificationAuthenticator.cs" />
     <Compile Include="Notification\NotificationSenderSettings.cs" />
+    <Compile Include="Notification\NotificationServiceCenter.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="Notification\NotificationDeviceType.cs" />
     <Compile Include="Notification\NotificationResult.cs" />
@@ -60,6 +63,7 @@
     <Compile Include="Options\Configuration\CertificationConfigurationElement.cs" />
     <Compile Include="Options\Configuration\GeneralConfiguration.cs" />
     <Compile Include="Options\Configuration\MessagingConfigurationElement.cs" />
+    <Compile Include="Options\IConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceCenter.cs" />
     <Compile Include="Storages\StorageClient.cs" />
@@ -84,9 +88,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Storages\Commands\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
