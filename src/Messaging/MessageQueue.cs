@@ -279,7 +279,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		internal HttpClient CreateHttpClient()
 		{
 			if(_provider == null)
-				throw new InvalidOperationException("");
+				throw new InvalidOperationException("Missing the required provider of the message queue.");
 
 			return new HttpClient(new HttpClientHandler(_provider.Certification, MessageQueueAuthenticator.Instance));
 		}
