@@ -89,12 +89,12 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			return new StorageUploader(this, path, bufferSize);
 		}
 
-		public StorageUploader GetUploader(string path, IDictionary<string, string> extendedProperties)
+		public StorageUploader GetUploader(string path, IDictionary<string, object> extendedProperties)
 		{
 			return new StorageUploader(this, path, extendedProperties);
 		}
 
-		public StorageUploader GetUploader(string path, IDictionary<string, string> extendedProperties, int bufferSize)
+		public StorageUploader GetUploader(string path, IDictionary<string, object> extendedProperties, int bufferSize)
 		{
 			return new StorageUploader(this, path, extendedProperties, bufferSize);
 		}
@@ -116,7 +116,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			return (await client.DeleteAsync(_serviceCenter.GetRequestUrl(path))).IsSuccessStatusCode;
 		}
 
-		public async Task<Stream> DownloadAsync(string path, IDictionary<string, string> properties = null)
+		public async Task<Stream> DownloadAsync(string path, IDictionary<string, object> properties = null)
 		{
 			var client = this.CreateHttpClient();
 			var response = await client.GetAsync(_serviceCenter.GetRequestUrl(path));
@@ -130,12 +130,12 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			return await response.Content.ReadAsStreamAsync();
 		}
 
-		public Task<bool> CreateAsync(string path, IDictionary<string, string> extendedProperties = null)
+		public Task<bool> CreateAsync(string path, IDictionary<string, object> extendedProperties = null)
 		{
 			return this.CreateAsync(path, null, extendedProperties);
 		}
 
-		public async Task<bool> CreateAsync(string path, Stream stream, IDictionary<string, string> extendedProperties = null)
+		public async Task<bool> CreateAsync(string path, Stream stream, IDictionary<string, object> extendedProperties = null)
 		{
 			var client = this.CreateHttpClient();
 			var request = this.CreateHttpRequest(HttpMethod.Put, path, this.EnsureCreatedTime(extendedProperties));
@@ -155,7 +155,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			return result.IsSuccessStatusCode;
 		}
 
-		public async Task<IDictionary<string, string>> GetExtendedPropertiesAsync(string path)
+		public async Task<IDictionary<string, object>> GetExtendedPropertiesAsync(string path)
 		{
 			var client = this.CreateHttpClient();
 			var request = new HttpRequestMessage(HttpMethod.Head, _serviceCenter.GetRequestUrl(path));
@@ -165,14 +165,14 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			//确认返回是否是成功
 			response.EnsureSuccessStatusCode();
 
-			var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+			var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 			this.FillProperties(response, result);
 
 			return result;
 		}
 
-		public async Task<bool> SetExtendedPropertiesAsync(string path, IDictionary<string, string> extendedProperties)
+		public async Task<bool> SetExtendedPropertiesAsync(string path, IDictionary<string, object> extendedProperties)
 		{
 			if(extendedProperties == null || extendedProperties.Count < 1)
 				return false;
@@ -228,7 +228,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			return new HttpClient(new HttpClientHandler(_certification, StorageAuthenticator.Instance));
 		}
 
-		internal HttpRequestMessage CreateHttpRequest(HttpMethod method, string path, IDictionary<string, string> extendedProperties = null)
+		internal HttpRequestMessage CreateHttpRequest(HttpMethod method, string path, IDictionary<string, object> extendedProperties = null)
 		{
 			var request = new HttpRequestMessage(method, _serviceCenter.GetRequestUrl(path));
 
@@ -239,23 +239,23 @@ namespace Zongsoft.Externals.Aliyun.Storages
 					if(string.IsNullOrWhiteSpace(entry.Key) || entry.Key.Contains(':'))
 						continue;
 
-					request.Headers.Add(StorageHeaders.OSS_META + entry.Key.Trim().ToLowerInvariant(), Uri.EscapeDataString(entry.Value));
+					request.Headers.Add(StorageHeaders.OSS_META + entry.Key.Trim().ToLowerInvariant(), entry.Value == null ? string.Empty : Uri.EscapeDataString(entry.Value.ToString()));
 				}
 			}
 
 			return request;
 		}
 
-		internal IDictionary<string, string> EnsureCreatedTime(IDictionary<string, string> properties)
+		internal IDictionary<string, object> EnsureCreatedTime(IDictionary<string, object> properties)
 		{
 			if(properties == null)
 			{
-				properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+				properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 				properties[StorageHeaders.ZFS_CREATEDTIME_PROPERTY] = Utility.GetGmtTime();
 			}
 			else
 			{
-				string value;
+				object value;
 
 				if(!properties.TryGetValue(StorageHeaders.ZFS_CREATEDTIME_PROPERTY, out value))
 					properties[StorageHeaders.ZFS_CREATEDTIME_PROPERTY] = Utility.GetGmtTime();
@@ -266,7 +266,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		#endregion
 
 		#region 私有方法
-		private void FillProperties(HttpResponseMessage response, IDictionary<string, string> properties)
+		private void FillProperties(HttpResponseMessage response, IDictionary<string, object> properties)
 		{
 			if(response == null || !response.IsSuccessStatusCode || properties == null)
 				return;

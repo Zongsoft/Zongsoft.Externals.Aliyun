@@ -55,7 +55,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		private int _offset;	//表示当前缓存的写入偏移量(即当前缓存中已写入字节数)
 		private byte[] _buffer;	//表示当前的缓存
 		private List<StorageMultipart> _multiparts;
-		private IDictionary<string, string> _extendedProperties;
+		private IDictionary<string, object> _extendedProperties;
 		private StorageClient _client;
 		private HttpClient _http;
 
@@ -72,7 +72,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 		}
 
-		public StorageUploader(StorageClient client, string path, IDictionary<string, string> extendedProperties, int bufferSize = DEFAULT_BUFFER_SIZE)
+		public StorageUploader(StorageClient client, string path, IDictionary<string, object> extendedProperties, int bufferSize = DEFAULT_BUFFER_SIZE)
 		{
 			if(client == null)
 				throw new ArgumentNullException("client");
@@ -115,9 +115,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 			get
 			{
-				//确认当前是否可用的
-				this.EnsureDisposed();
-
 				return _length + _offset;
 			}
 		}

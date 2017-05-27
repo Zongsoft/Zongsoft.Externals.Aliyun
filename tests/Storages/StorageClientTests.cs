@@ -120,7 +120,7 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		[Xunit.Fact]
 		public void SetExtendedPropertiesTest()
 		{
-			var dictionary = new Dictionary<string, string>()
+			var dictionary = new Dictionary<string, object>()
 			{
 				{"WeChat-ID", "My WeChat"},
 			};

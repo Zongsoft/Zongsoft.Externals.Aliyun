@@ -158,12 +158,12 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			#endregion
 
 			#region 公共方法
-			public bool Create(string path, IDictionary<string, string> properties = null)
+			public bool Create(string path, IDictionary<string, object> properties = null)
 			{
 				return Utility.ExecuteTask(() => _client.CreateAsync(this.EnsureDirectoryPath(path), properties));
 			}
 
-			public async Task<bool> CreateAsync(string path, IDictionary<string, string> properties = null)
+			public async Task<bool> CreateAsync(string path, IDictionary<string, object> properties = null)
 			{
 				return await _client.CreateAsync(this.EnsureDirectoryPath(path), properties);
 			}
@@ -228,12 +228,12 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				return this.GenerateInfo(path, properties);
 			}
 
-			public bool SetInfo(string path, IDictionary<string, string> properties)
+			public bool SetInfo(string path, IDictionary<string, object> properties)
 			{
 				return Utility.ExecuteTask(() => _client.SetExtendedPropertiesAsync(this.EnsureDirectoryPath(path), properties));
 			}
 
-			public async Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties)
+			public async Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties)
 			{
 				return await _client.SetExtendedPropertiesAsync(this.EnsureDirectoryPath(path), properties);
 			}
@@ -381,7 +381,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				return this.EnsureDirectoryPath(path) + pattern.Trim('*', ' ', '\t', '\r', '\n').TrimStart('/');
 			}
 
-			private Zongsoft.IO.DirectoryInfo GenerateInfo(string path, IDictionary<string, string> properties)
+			private Zongsoft.IO.DirectoryInfo GenerateInfo(string path, IDictionary<string, object> properties)
 			{
 				if(properties == null)
 					return null;
@@ -389,17 +389,17 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				DateTimeOffset createdTimeOffset, modifiedTimeOffset;
 				DateTime? createdTime = null, modifiedTime = null;
 
-				string text;
+				object value;
 
-				if(properties.TryGetValue(StorageHeaders.ZFS_CREATEDTIME_PROPERTY, out text))
+				if(properties.TryGetValue(StorageHeaders.ZFS_CREATEDTIME_PROPERTY, out value))
 				{
-					if(Zongsoft.Common.Convert.TryConvertValue(text, out createdTimeOffset))
+					if(Zongsoft.Common.Convert.TryConvertValue(value, out createdTimeOffset))
 						createdTime = createdTimeOffset.LocalDateTime;
 				}
 
-				if(properties.TryGetValue(StorageHeaders.HTTP_LAST_MODIFIED_PROPERTY, out text))
+				if(properties.TryGetValue(StorageHeaders.HTTP_LAST_MODIFIED_PROPERTY, out value))
 				{
-					if(Zongsoft.Common.Convert.TryConvertValue(text, out modifiedTimeOffset))
+					if(Zongsoft.Common.Convert.TryConvertValue(value, out modifiedTimeOffset))
 						modifiedTime = modifiedTimeOffset.LocalDateTime;
 				}
 
@@ -526,32 +526,32 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				return this.GenerateInfo(path, properties);
 			}
 
-			public bool SetInfo(string path, IDictionary<string, string> properties)
+			public bool SetInfo(string path, IDictionary<string, object> properties)
 			{
 				return Utility.ExecuteTask(() => _client.SetExtendedPropertiesAsync(this.EnsureFilePath(path), properties));
 			}
 
-			public async Task<bool> SetInfoAsync(string path, IDictionary<string, string> properties)
+			public async Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties)
 			{
 				return await _client.SetExtendedPropertiesAsync(this.EnsureFilePath(path), properties);
 			}
 
-			public Stream Open(string path, IDictionary<string, string> properties = null)
+			public Stream Open(string path, IDictionary<string, object> properties = null)
 			{
 				return this.Open(path, FileMode.Open, FileAccess.Read, FileShare.None, properties);
 			}
 
-			public Stream Open(string path, FileMode mode, IDictionary<string, string> properties = null)
+			public Stream Open(string path, FileMode mode, IDictionary<string, object> properties = null)
 			{
 				return this.Open(path, mode, FileAccess.Read, FileShare.None, properties);
 			}
 
-			public Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, string> properties = null)
+			public Stream Open(string path, FileMode mode, FileAccess access, IDictionary<string, object> properties = null)
 			{
 				return this.Open(path, mode, access, FileShare.None, properties);
 			}
 
-			public Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, string> properties = null)
+			public Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, object> properties = null)
 			{
 				bool writable = (mode != FileMode.Open) || (access & FileAccess.Write) == FileAccess.Write;
 
@@ -571,7 +571,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				return path.Trim().TrimEnd('/', '\\');
 			}
 
-			private Zongsoft.IO.FileInfo GenerateInfo(string path, IDictionary<string, string> properties)
+			private Zongsoft.IO.FileInfo GenerateInfo(string path, IDictionary<string, object> properties)
 			{
 				if(properties == null)
 					return null;
@@ -580,25 +580,27 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				DateTime? createdTime = null, modifiedTime = null;
 				int size = 0;
 				byte[] checksum = null;
-				string text;
+				object value;
 
-				if(properties.TryGetValue(StorageHeaders.ZFS_CREATEDTIME_PROPERTY, out text))
+				if(properties.TryGetValue(StorageHeaders.ZFS_CREATEDTIME_PROPERTY, out value))
 				{
-					if(Zongsoft.Common.Convert.TryConvertValue(text, out createdTimeOffset))
+					if(Zongsoft.Common.Convert.TryConvertValue(value, out createdTimeOffset))
 						createdTime = createdTimeOffset.LocalDateTime;
 				}
 
-				if(properties.TryGetValue(StorageHeaders.HTTP_LAST_MODIFIED_PROPERTY, out text))
+				if(properties.TryGetValue(StorageHeaders.HTTP_LAST_MODIFIED_PROPERTY, out value))
 				{
-					if(Zongsoft.Common.Convert.TryConvertValue(text, out modifiedTimeOffset))
+					if(Zongsoft.Common.Convert.TryConvertValue(value, out modifiedTimeOffset))
 						modifiedTime = modifiedTimeOffset.LocalDateTime;
 				}
 
-				if(properties.TryGetValue(StorageHeaders.HTTP_CONTENT_LENGTH_PROPERTY, out text))
-					Zongsoft.Common.Convert.TryConvertValue(text, out size);
+				if(properties.TryGetValue(StorageHeaders.HTTP_CONTENT_LENGTH_PROPERTY, out value))
+					Zongsoft.Common.Convert.TryConvertValue(value, out size);
 
-				if(properties.TryGetValue(StorageHeaders.HTTP_ETAG_PROPERTY, out text))
-					checksum = Zongsoft.Common.Convert.FromHexString(text.Trim('"'), '-');
+				if(properties.TryGetValue(StorageHeaders.HTTP_ETAG_PROPERTY, out value) && value != null)
+				{
+					checksum = Zongsoft.Common.Convert.FromHexString(value.ToString().Trim('"'), '-');
+				}
 
 				var info = new Zongsoft.IO.FileInfo(path, size, checksum, createdTime, modifiedTime, _fileSystem.GetUrl(path));
 
@@ -616,6 +618,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			{
 				#region 成员字段
 				private StorageUploader _uploader;
+				private long _length;
 				#endregion
 
 				#region 构造函数
@@ -657,10 +660,12 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				{
 					get
 					{
-						//确认当前流是否可用
-						var uploader = this.EnsureUploader();
+						var uploader = _uploader;
 
-						return uploader.Length;
+						if(uploader != null)
+							return uploader.Length;
+
+						return _length;
 					}
 				}
 
@@ -719,7 +724,10 @@ namespace Zongsoft.Externals.Aliyun.Storages
 					var uploader = System.Threading.Interlocked.Exchange(ref _uploader, null);
 
 					if(uploader != null)
+					{
+						_length = uploader.Length;
 						uploader.Dispose();
+					}
 				}
 				#endregion
 
