@@ -31,6 +31,7 @@ namespace Zongsoft.Externals.Aliyun.Notification
 {
 	public class NotificationResult
 	{
+		#region 公共属性
 		public string RequestId
 		{
 			get;
@@ -62,5 +63,21 @@ namespace Zongsoft.Externals.Aliyun.Notification
 				return string.IsNullOrWhiteSpace(this.Code);
 			}
 		}
+		#endregion
+
+		#region 公共方法
+		public Zongsoft.Services.ICommandResult ToCommandResult()
+		{
+			var data = "RequestId:" + this.RequestId;
+
+			if(!string.IsNullOrWhiteSpace(this.MessageId))
+				data += "|MessageId:" + this.MessageId;
+
+			if(this.IsSucceed)
+				return Zongsoft.Services.CommandResult.Success(data, this.Message, this.Code);
+			else
+				return Zongsoft.Services.CommandResult.Failure(this.Code, this.Message, data);
+		}
+		#endregion
 	}
 }

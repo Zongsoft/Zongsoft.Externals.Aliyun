@@ -28,9 +28,15 @@ using System;
 
 namespace Zongsoft.Externals.Aliyun.Notification
 {
+	/// <summary>
+	/// 关于移动消息推送类型的枚举。
+	/// </summary>
 	public enum NotificationType
 	{
+		/// <summary>消息</summary>
 		Message,
+
+		/// <summary>通知</summary>
 		Notice,
 	}
 }

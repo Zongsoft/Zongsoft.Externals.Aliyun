@@ -32,6 +32,9 @@ using System.Threading.Tasks;
 
 namespace Zongsoft.Externals.Aliyun.Notification
 {
+	/// <summary>
+	/// 表示移动推送器的类。
+	/// </summary>
 	public class NotificationSender
 	{
 		#region 成员字段
@@ -88,11 +91,12 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		/// 发送消息或通知到移动设备。
 		/// </summary>
 		/// <param name="name">指定的消息推送通道的名字（即阿里云移动推送的AppKey参数）。</param>
+		/// <param name="title">指定的消息或通知的标题。</param>
 		/// <param name="content">指定的消息或通知的内容。</param>
 		/// <param name="destination">指定的推送目标。</param>
 		/// <param name="settings">指定的推送设置参数。</param>
 		/// <returns>返回推送的结果。</returns>
-		public async Task<NotificationResult> Send(string name, string content, string destination, NotificationSenderSettings settings)
+		public async Task<NotificationResult> Send(string name, string title, string content, string destination, NotificationSenderSettings settings)
 		{
 			var configuration = this.Configuration;
 
@@ -105,11 +109,23 @@ namespace Zongsoft.Externals.Aliyun.Notification
 			if(string.IsNullOrWhiteSpace(content))
 				return null;
 
-			var url = "http://" + this.ServiceCenter.Path + "?" + this.GetQueryString(this.GetParameters(name, settings));
-			var request = new HttpRequestMessage(HttpMethod.Post, url);
-			var body = $"{{\"Body\":\"{content.Replace('"', '\'')}\",\"TargetValue\":\"{destination.Replace('"', '\'')}\"}}";
-			request.Content = new StringContent(body);
-			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+			//获取请求的查询参数集
+			var parameters = this.GetParameters(name, settings);
+
+			parameters["TargetValue"] = destination;
+			parameters["Title"] = string.IsNullOrWhiteSpace(title) ? "New " + settings.Type.ToString() : title;
+			parameters["Body"] = content;
+
+			var url = "http://" + this.ServiceCenter.Path + "?" + this.GetQueryString(parameters);
+			var request = new HttpRequestMessage(HttpMethod.Get, url);
+			//var dictionary = new Dictionary<string, string>
+			//{
+			//	{ "Title", string.IsNullOrWhiteSpace(title) ? "New " + settings.Type.ToString() : title },
+			//	{ "Body", content },
+			//	{ "TargetValue", destination },
+			//};
+			//request.Content = new FormUrlEncodedContent(dictionary);
+			//request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
 
 			var response = await this.GetHttpClient().SendAsync(request);
 
@@ -140,10 +156,16 @@ namespace Zongsoft.Externals.Aliyun.Notification
 
 				//以下是推送接口特定参数
 				{ "AppKey", name },
-				{ "PushType", settings.Type.ToString() },
-				{ "DeviceType", settings.DeviceType.ToString() },
-				{ "Target", settings.TargetType.ToString() },
+				{ "PushType", settings.Type.ToString().ToUpperInvariant() },
+				{ "DeviceType", settings.DeviceType.ToString().ToUpperInvariant() },
+				{ "Target", settings.TargetType.ToString().ToUpperInvariant() },
 			};
+
+			if(settings.Expiry > 0)
+			{
+				dictionary["StoreOffline"] = "true";
+				dictionary["ExpireTime"] = DateTime.UtcNow.AddMinutes(settings.Expiry).ToString("s") + "Z";
+			}
 
 			return dictionary;
 		}

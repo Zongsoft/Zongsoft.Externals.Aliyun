@@ -65,15 +65,24 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		{
 			var parts = request.RequestUri.Query.TrimStart('?').Split('&');
 			var dictionary = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+			string key, value;
 
 			foreach(var part in parts)
 			{
 				var index = part.IndexOf('=');
 
 				if(index > 0)
-					dictionary[part.Substring(0, index)] = index < part.Length - 1 ? part.Substring(index + 1) : null;
+				{
+					key = Uri.UnescapeDataString(part.Substring(0, index));
+					value = index < part.Length - 1 ? Uri.UnescapeDataString(part.Substring(index + 1)) : null;
+				}
 				else
-					dictionary[part] = null;
+				{
+					key = Uri.UnescapeDataString(part);
+					value = null;
+				}
+
+				dictionary[key] = value;
 			}
 
 			var text = new StringBuilder((int)Math.Ceiling(request.RequestUri.Query.Length * 1.5));

@@ -65,12 +65,13 @@ namespace Zongsoft.Externals.Aliyun
 					break;
 				case HttpSignatureMode.Parameter:
 					var delimiter = string.IsNullOrWhiteSpace(request.RequestUri.Query) ? "?" : "&";
+					var signature = Uri.EscapeDataString(_authenticator.Signature(request, _certification.Secret));
 
 					request.RequestUri = new Uri(
 						request.RequestUri.Scheme + "://" +
 						request.RequestUri.Authority +
 						request.RequestUri.PathAndQuery + delimiter +
-						_authenticator.Name + "="  + _authenticator.Signature(request, _certification.Secret) +
+						_authenticator.Name + "="  + signature +
 						request.RequestUri.Fragment);
 
 					break;

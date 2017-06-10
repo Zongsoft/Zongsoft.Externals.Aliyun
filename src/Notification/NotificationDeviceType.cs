@@ -28,10 +28,18 @@ using System;
 
 namespace Zongsoft.Externals.Aliyun.Notification
 {
+	/// <summary>
+	/// 关于移动推送的设备类型的枚举。
+	/// </summary>
 	public enum NotificationDeviceType
 	{
+		/// <summary>所有设备</summary>
 		All,
+
+		/// <summary>安卓设备</summary>
 		Android,
+
+		/// <summary>苹果设备</summary>
 		iOS,
 	}
 }

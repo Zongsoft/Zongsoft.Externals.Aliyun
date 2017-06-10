@@ -29,12 +29,24 @@ using System.ComponentModel;
 
 namespace Zongsoft.Externals.Aliyun.Notification
 {
+	/// <summary>
+	/// 关于移动推送目标种类(推送方式)的枚举。
+	/// </summary>
 	public enum NotificationTargetType
 	{
+		/// <summary>所有</summary>
 		All,
+
+		/// <summary>设备</summary>
 		Device,
+
+		/// <summary>账号</summary>
 		Account,
+
+		/// <summary>别名</summary>
 		Alias,
+
+		/// <summary>标签</summary>
 		Tag,
 	}
 }

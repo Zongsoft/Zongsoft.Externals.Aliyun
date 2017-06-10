@@ -123,4 +123,25 @@
   <data name="Text.NotificationSendCommand.Faild" xml:space="preserve">
     <value>通知发送命令执行失败。</value>
   </data>
+  <data name="Text.NotificationSendCommand.Options.DeviceType" xml:space="preserve">
+    <value>推送的设备类型。</value>
+  </data>
+  <data name="Text.NotificationSendCommand.Options.Expiry" xml:space="preserve">
+    <value>离线消息或通知的有效期（单位：分钟，最大支持72小时）。</value>
+  </data>
+  <data name="Text.NotificationSendCommand.Options.Name" xml:space="preserve">
+    <value>推送通道的名称（移动推送的AppKey参数）。</value>
+  </data>
+  <data name="Text.NotificationSendCommand.Options.Target" xml:space="preserve">
+    <value>推送的目标，其含义由TargetType选项定义。</value>
+  </data>
+  <data name="Text.NotificationSendCommand.Options.TargetType" xml:space="preserve">
+    <value>推送目标类型（推送方式）。</value>
+  </data>
+  <data name="Text.NotificationSendCommand.Options.Title" xml:space="preserve">
+    <value>推送的消息或通知的标题。</value>
+  </data>
+  <data name="Text.NotificationSendCommand.Options.Type" xml:space="preserve">
+    <value>推送的类型，默认为消息(Message)。</value>
+  </data>
 </root>

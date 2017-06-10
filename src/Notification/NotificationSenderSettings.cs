@@ -28,9 +28,13 @@ using System;
 
 namespace Zongsoft.Externals.Aliyun.Notification
 {
+	/// <summary>
+	/// 表示移动推送的设置选项类。
+	/// </summary>
 	public class NotificationSenderSettings
 	{
 		#region 成员字段
+		private int _expiry;
 		private NotificationType _type;
 		private NotificationDeviceType _deviceType;
 		private NotificationTargetType _targetType;
@@ -39,13 +43,15 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		#region 构造函数
 		public NotificationSenderSettings()
 		{
+			_expiry = 60 * 72;
 			_type = NotificationType.Message;
 			_deviceType = NotificationDeviceType.All;
 			_targetType = NotificationTargetType.Alias;
 		}
 
-		public NotificationSenderSettings(NotificationType type, NotificationDeviceType deviceType, NotificationTargetType targetType)
+		public NotificationSenderSettings(NotificationType type, NotificationDeviceType deviceType, NotificationTargetType targetType, int expiry = 0)
 		{
+			_expiry = expiry < 0 ? 60 * 72 : expiry;
 			_type = type;
 			_deviceType = deviceType;
 			_targetType = targetType;
@@ -53,6 +59,24 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		#endregion
 
 		#region 公共属性
+		/// <summary>
+		/// 获取或设置移动推送消息或通知的过期时间，即当指定的目标不在线的情况下保存的有效期（单位：分钟）。
+		/// </summary>
+		public int Expiry
+		{
+			get
+			{
+				return _expiry;
+			}
+			set
+			{
+				_expiry = value;
+			}
+		}
+
+		/// <summary>
+		/// 获取或设置移动推送的类型（消息或通知），默认值为消息(Message)。
+		/// </summary>
 		public NotificationType Type
 		{
 			get
@@ -65,6 +89,9 @@ namespace Zongsoft.Externals.Aliyun.Notification
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置移动推送的设备类型，默认值为所有(All)。
+		/// </summary>
 		public NotificationDeviceType DeviceType
 		{
 			get
@@ -77,6 +104,9 @@ namespace Zongsoft.Externals.Aliyun.Notification
 			}
 		}
 
+		/// <summary>
+		/// 获取或设置移动推送的目标（即推送方式）。
+		/// </summary>
 		public NotificationTargetType TargetType
 		{
 			get

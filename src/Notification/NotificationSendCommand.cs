@@ -32,11 +32,13 @@ using Zongsoft.Resources;
 
 namespace Zongsoft.Externals.Aliyun.Notification
 {
-	[CommandOption("Name", typeof(string), null, "")]
-	[CommandOption("Type", typeof(NotificationType), NotificationType.Message, "")]
-	[CommandOption("DeviceType", typeof(NotificationDeviceType), NotificationDeviceType.Android, "")]
-	[CommandOption("TargetType", typeof(NotificationTargetType), NotificationTargetType.Alias, "")]
-	[CommandOption("Target", typeof(string), null, true, "")]
+	[CommandOption("Name", typeof(string), null, "Text.NotificationSendCommand.Options.Name")]
+	[CommandOption("Title", typeof(string), null, "Text.NotificationSendCommand.Options.Title")]
+	[CommandOption("Expiry", typeof(int), -1, "Text.NotificationSendCommand.Options.Expiry")]
+	[CommandOption("Type", typeof(NotificationType), NotificationType.Message, "Text.NotificationSendCommand.Options.Type")]
+	[CommandOption("DeviceType", typeof(NotificationDeviceType), NotificationDeviceType.Android, "Text.NotificationSendCommand.Options.DeviceType")]
+	[CommandOption("TargetType", typeof(NotificationTargetType), NotificationTargetType.Alias, "Text.NotificationSendCommand.Options.TargetType")]
+	[CommandOption("Target", typeof(string), null, true, "Text.NotificationSendCommand.Options.Target")]
 	public class NotificationSendCommand : CommandBase<CommandContext>
 	{
 		#region 成员字段
@@ -73,7 +75,7 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		#region 执行方法
 		protected override object OnExecute(CommandContext context)
 		{
-			if(context.Expression.Arguments.Length == 0)
+			if(context.Parameter == null && context.Expression.Arguments.Length == 0)
 				throw new CommandException(ResourceUtility.GetString("Text.MissingCommandArguments"));
 
 			var destination = context.Expression.Options.GetValue<string>("target");
@@ -82,21 +84,37 @@ namespace Zongsoft.Externals.Aliyun.Notification
 				throw new CommandOptionMissingException("target");
 
 			var settings = new NotificationSenderSettings(context.Expression.Options.GetValue<NotificationType>("type"),
-			                                              context.Expression.Options.GetValue<NotificationDeviceType>("deviceType"),
-			                                              context.Expression.Options.GetValue<NotificationTargetType>("targetType"));
+														  context.Expression.Options.GetValue<NotificationDeviceType>("deviceType"),
+														  context.Expression.Options.GetValue<NotificationTargetType>("targetType"),
+														  context.Expression.Options.GetValue<int>("expiry"));
 
-			var results = new List<NotificationResult>();
+			var results = new List<ICommandResult>();
 
-			foreach(var argument in context.Expression.Arguments)
+			if(context.Parameter != null)
 			{
-				var result = Utility.ExecuteTask(() => _sender.Send(context.Expression.Options.GetValue<string>("name"), argument, destination, settings));
+				var content = this.GetContent(context.Parameter);
+
+				var result = this.Send(
+					context.Expression.Options.GetValue<string>("name"),
+					context.Expression.Options.GetValue<string>("title"),
+					content, destination, settings, _ => context.Error.WriteLine(ResourceUtility.GetString("Text.NotificationSendCommand.Faild")));
 
 				if(result != null)
 				{
-					if(!result.IsSucceed)
-						context.Error.WriteLine(ResourceUtility.GetString("Text.NotificationSendCommand.Faild"));
+					results.Add(result.ToCommandResult());
+				}
+			}
 
-					results.Add(result);
+			foreach(var argument in context.Expression.Arguments)
+			{
+				var result = this.Send(
+					context.Expression.Options.GetValue<string>("name"),
+					context.Expression.Options.GetValue<string>("title"),
+					argument, destination, settings, _ => context.Error.WriteLine(ResourceUtility.GetString("Text.NotificationSendCommand.Faild")));
+
+				if(result != null)
+				{
+					results.Add(result.ToCommandResult());
 				}
 			}
 
@@ -106,6 +124,35 @@ namespace Zongsoft.Externals.Aliyun.Notification
 				return results[0];
 
 			return results;
+		}
+		#endregion
+
+		#region 私有方法
+		private NotificationResult Send(string name, string title, string content, string destination, NotificationSenderSettings settings, Action<NotificationResult> onFaild)
+		{
+			var result = Utility.ExecuteTask(() => _sender.Send(name, title, content, destination, settings));
+
+			if(result != null)
+			{
+				if(!result.IsSucceed && onFaild != null)
+					onFaild(result);
+			}
+
+			return result;
+		}
+
+		private string GetContent(object value)
+		{
+			if(value == null)
+				return null;
+
+			if(value is string)
+				return (string)value;
+
+			if(value is System.Text.StringBuilder || Zongsoft.Common.TypeExtension.IsScalarType(value.GetType()))
+				return value.ToString();
+
+			return Zongsoft.Runtime.Serialization.Serializer.Json.Serialize(value);
 		}
 		#endregion
 	}
