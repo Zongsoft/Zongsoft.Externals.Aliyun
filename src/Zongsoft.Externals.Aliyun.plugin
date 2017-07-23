@@ -29,8 +29,8 @@
 	</extension>
 
 	<extension path="/Workbench/Executor/Commands">
-		<commandNode name="Notification">
+		<object name="Notification">
 			<object name="Send" sender="{path:/Workspace/Notification/Sender}" type="Zongsoft.Externals.Aliyun.Notification.NotificationSendCommand, Zongsoft.Externals.Aliyun" />
-		</commandNode>
+		</object>
 	</extension>
 </plugin>
