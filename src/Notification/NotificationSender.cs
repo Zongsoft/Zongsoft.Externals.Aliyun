@@ -118,6 +118,8 @@ namespace Zongsoft.Externals.Aliyun.Notification
 
 			var url = "http://" + this.ServiceCenter.Path + "?" + this.GetQueryString(parameters);
 			var request = new HttpRequestMessage(HttpMethod.Get, url);
+			request.Headers.Accept.TryParseAdd("application/json");
+
 			//var dictionary = new Dictionary<string, string>
 			//{
 			//	{ "Title", string.IsNullOrWhiteSpace(title) ? "New " + settings.Type.ToString() : title },
@@ -129,7 +131,15 @@ namespace Zongsoft.Externals.Aliyun.Notification
 
 			var response = await this.GetHttpClient().SendAsync(request);
 
-			return Zongsoft.Runtime.Serialization.Serializer.Json.Deserialize<NotificationResult>(await response.Content.ReadAsStringAsync());
+			if(string.Equals(response.Content.Headers.ContentType.MediaType, "application/json", StringComparison.OrdinalIgnoreCase) ||
+			   string.Equals(response.Content.Headers.ContentType.MediaType, "text/json", StringComparison.OrdinalIgnoreCase))
+				return Zongsoft.Runtime.Serialization.Serializer.Json.Deserialize<NotificationResult>(await response.Content.ReadAsStringAsync());
+
+			return new NotificationResult()
+			{
+				Code = response.StatusCode.ToString(),
+				Message = await response.Content.ReadAsStringAsync(),
+			};
 		}
 		#endregion
 
