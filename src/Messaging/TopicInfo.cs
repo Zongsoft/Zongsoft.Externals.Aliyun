@@ -25,46 +25,76 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Messaging
 {
 	/// <summary>
-	/// 表示阿里云的配置接口。
+	/// 表示主题信息的实体类。
 	/// </summary>
-	public interface IConfiguration
+	public class TopicInfo
 	{
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取或设置主题的名称。
 		/// </summary>
-		ServiceCenterName Name
+		public string Name
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取或设置主题的创建时间。
 		/// </summary>
-		bool IsInternal
+		public DateTime CreatedTime
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取配置的凭证对象。
+		/// 获取或设置主题的最后修改时间。
 		/// </summary>
-		ICertification Certification
+		public DateTime? ModifiedTime
 		{
 			get;
+			set;
 		}
 
 		/// <summary>
-		/// 获取消息队列(MNS)的配置信息。
+		/// 获取或设置主题中消息的最大长度，单位：byte。
 		/// </summary>
-		IMessagingConfiguration Messaging
+		public int MaximumMessageSize
 		{
 			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置主题中消息的最大保持时长。
+		/// </summary>
+		public TimeSpan MessageRetentionPeriod
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置当前主题中的消息数量。
+		/// </summary>
+		public int MessageCount
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置一个值，指示主题队列是否启用了日志记录。
+		/// </summary>
+		public bool LoggingEnabled
+		{
+			get;
+			set;
 		}
 	}
 }

@@ -44,7 +44,8 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#endregion
 
 		#region 成员字段
-		private MessageQueueProvider _provider;
+		private readonly HttpClient _http;
+		private readonly MessageQueueProvider _provider;
 		#endregion
 
 		#region 构造函数
@@ -54,14 +55,24 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				throw new ArgumentNullException("provider");
 
 			_provider = provider;
+			_http = new HttpClient(new HttpClientHandler(_provider.Certification, MessageQueueAuthenticator.Instance));
+		}
+		#endregion
+
+		#region 内部属性
+		internal HttpClient Http
+		{
+			get
+			{
+				return _http;
+			}
 		}
 		#endregion
 
 		#region 重写方法
 		public override async Task<long> GetCountAsync()
 		{
-			var client = this.CreateHttpClient();
-			var response = await client.GetAsync(this.GetRequestUrl());
+			var response = await _http.GetAsync(this.GetRequestUrl());
 
 			if(!response.IsSuccessStatusCode)
 				return 0;
@@ -93,7 +104,6 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				return 0;
 
 			var count = 0;
-			var client = this.CreateHttpClient();
 
 			foreach(var item in items)
 			{
@@ -124,7 +134,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				request.Content = new StringContent(text, Encoding.UTF8, "text/xml");
 				request.Headers.Add("x-mns-version", "2015-06-06");
 
-				var response = await client.SendAsync(request);
+				var response = await _http.SendAsync(request);
 
 				if(!response.IsSuccessStatusCode)
 				{
@@ -211,10 +221,9 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 
 		private async Task<Zongsoft.Messaging.MessageBase> DequeueOrPeekAsync(int waitSeconds)
 		{
-			var client = this.CreateHttpClient();
 			var request = new HttpRequestMessage(HttpMethod.Get, this.GetRequestUrl("messages") + (waitSeconds >= 0 ? "?waitseconds=" + waitSeconds.ToString() : "?peekonly=true"));
 			request.Headers.Add("x-mns-version", "2015-06-06");
-			var response = await client.SendAsync(request);
+			var response = await _http.SendAsync(request);
 
 			if(response.IsSuccessStatusCode)
 				return MessageUtility.ResolveMessage(this, await response.Content.ReadAsStreamAsync());
@@ -276,14 +285,6 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#endregion
 
 		#region 内部方法
-		internal HttpClient CreateHttpClient()
-		{
-			if(_provider == null)
-				throw new InvalidOperationException("Missing the required provider of the message queue.");
-
-			return new HttpClient(new HttpClientHandler(_provider.Certification, MessageQueueAuthenticator.Instance));
-		}
-
 		internal string GetRequestUrl(params string[] parts)
 		{
 			var args = (parts == null ? new string[1] : new string[parts.Length + 1]);

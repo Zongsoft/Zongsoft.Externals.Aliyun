@@ -39,7 +39,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 	public class StorageFileSystem : Zongsoft.IO.IFileSystem
 	{
 		#region 成员字段
-		private Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration _option;
+		private Options.IConfiguration _configuration;
 		private StorageFileProvider _file;
 		private StorageDirectoryProvider _directory;
 		#endregion
@@ -49,12 +49,12 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 		}
 
-		public StorageFileSystem(Options.Configuration.GeneralConfiguration option)
+		public StorageFileSystem(Options.IConfiguration configuration)
 		{
-			if(option == null)
-				throw new ArgumentNullException("option");
+			if(configuration == null)
+				throw new ArgumentNullException(nameof(configuration));
 
-			_option = option;
+			_configuration = configuration;
 		}
 		#endregion
 
@@ -92,18 +92,18 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			}
 		}
 
-		public Options.Configuration.GeneralConfiguration Option
+		public Options.IConfiguration Configuration
 		{
 			get
 			{
-				return _option;
+				return _configuration;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
-				_option = value;
+				_configuration = value;
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 			get
 			{
-				var option = _option;
+				var option = _configuration;
 
 				if(option == null)
 					return null;
@@ -129,7 +129,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			if(string.IsNullOrWhiteSpace(path))
 				throw new ArgumentNullException("path");
 
-			var option = _option;
+			var option = _configuration;
 
 			if(option == null)
 				throw new InvalidOperationException("The value of 'Option' property is null.");

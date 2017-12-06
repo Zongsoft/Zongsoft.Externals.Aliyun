@@ -86,13 +86,13 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 							body = Utility.Xml.ReadContentAsString(reader);
 							break;
 						case "EnqueueTime":
-							enqueuedTime = Utility.GetExpiresTimeFromMilliseconds(Utility.Xml.ReadContentAsString(reader));
+							enqueuedTime = Utility.GetDateTimeFromEpoch(Utility.Xml.ReadContentAsString(reader));
 							break;
 						case "NextVisibleTime":
-							expires = Utility.GetExpiresTimeFromMilliseconds(Utility.Xml.ReadContentAsString(reader));
+							expires = Utility.GetDateTimeFromEpoch(Utility.Xml.ReadContentAsString(reader));
 							break;
 						case "FirstDequeueTime":
-							dequeuedTime = Utility.GetExpiresTimeFromMilliseconds(Utility.Xml.ReadContentAsString(reader));
+							dequeuedTime = Utility.GetDateTimeFromEpoch(Utility.Xml.ReadContentAsString(reader));
 							break;
 						case "DequeueCount":
 							dequeuedCount = Zongsoft.Common.Convert.ConvertValue<int>(Utility.Xml.ReadContentAsString(reader));
@@ -115,6 +115,57 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 					InnerAcknowledgementId = ackId,
 					InnerPriority = priority,
 				};
+		}
+
+		public static TopicInfo ResolveTopicInfo(Stream stream)
+		{
+			if(stream == null)
+				return null;
+
+			var settings = new XmlReaderSettings()
+			{
+				IgnoreComments = true,
+				IgnoreProcessingInstructions = true,
+				IgnoreWhitespace = true,
+			};
+
+			using(var reader = XmlReader.Create(stream, settings))
+			{
+				if(reader.MoveToContent() != XmlNodeType.Element)
+					return null;
+
+				var info = new TopicInfo();
+
+				while(reader.Read())
+				{
+					if(reader.NodeType != XmlNodeType.Element)
+						continue;
+
+					switch(reader.LocalName)
+					{
+						case "TopicName":
+							info.Name = Utility.Xml.ReadContentAsString(reader);
+							break;
+						case "CreateTime":
+							info.CreatedTime = Utility.GetDateTimeFromEpoch(Utility.Xml.ReadContentAsString(reader));
+							break;
+						case "LastModifyTime":
+							info.ModifiedTime = Utility.GetDateTimeFromEpoch(Utility.Xml.ReadContentAsString(reader));
+							break;
+						case "MessageRetentionPeriod":
+							info.MessageRetentionPeriod = TimeSpan.FromSeconds(reader.ReadElementContentAsInt());
+							break;
+						case "MessageCount":
+							info.MessageCount = Zongsoft.Common.Convert.ConvertValue<int>(Utility.Xml.ReadContentAsString(reader));
+							break;
+						case "LoggingEnabled":
+							info.LoggingEnabled = Zongsoft.Common.Convert.ConvertValue<bool>(Utility.Xml.ReadContentAsString(reader));
+							break;
+					}
+				}
+
+				return info;
+			}
 		}
 	}
 }

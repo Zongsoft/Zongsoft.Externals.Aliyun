@@ -78,8 +78,8 @@ namespace Zongsoft.Externals.Aliyun.Options.Configuration
 			}
 		}
 
-		[OptionConfigurationProperty(XML_MESSAGING_ELEMENT)]
-		public MessagingConfigurationElement Messaging
+		[OptionConfigurationProperty(XML_MESSAGING_ELEMENT, Type = typeof(MessagingConfigurationElement))]
+		public IMessagingConfiguration Messaging
 		{
 			get
 			{

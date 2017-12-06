@@ -13,7 +13,7 @@
 	</manifest>
 
 	<extension path="/Workbench/FileSystem">
-		<object name="Aliyun-OSS" option="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
+		<object name="Aliyun-OSS" configuration="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
 	</extension>
 
 	<extension path="/Workspace/Notification">
@@ -21,11 +21,13 @@
 	</extension>
 
 	<extension path="/Workspace/Messaging">
-		<object name="Queues" option="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
+		<object name="Queues" configuration="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
+		<object name="Topics" configuration="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.TopicProvider, Zongsoft.Externals.Aliyun" />
 	</extension>
 
 	<extension path="/Workspace/Services">
 		<object name="MessageQueueProvider" value="{path:/Workspace/Messaging/Queues}" />
+		<object name="MessageTopicProvider" value="{path:/Workspace/Messaging/Topics}" />
 	</extension>
 
 	<extension path="/Workbench/Executor/Commands">

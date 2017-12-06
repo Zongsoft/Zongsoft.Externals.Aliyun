@@ -25,46 +25,15 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Messaging
 {
-	/// <summary>
-	/// 表示阿里云的配置接口。
-	/// </summary>
-	public interface IConfiguration
+	public class TopicEmailState
 	{
-		/// <summary>
-		/// 获取或设置配置的服务中心。
-		/// </summary>
-		ServiceCenterName Name
-		{
-			get;
-			set;
-		}
+	}
 
-		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
-		/// </summary>
-		bool IsInternal
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取配置的凭证对象。
-		/// </summary>
-		ICertification Certification
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取消息队列(MNS)的配置信息。
-		/// </summary>
-		IMessagingConfiguration Messaging
-		{
-			get;
-		}
+	public class TopicSmsState
+	{
 	}
 }

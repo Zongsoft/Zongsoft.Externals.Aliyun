@@ -34,7 +34,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 	{
 		#region 成员字段
 		private ConcurrentDictionary<string, MessageQueue> _queues;
-		private Options.Configuration.GeneralConfiguration _option;
+		private Options.IConfiguration _configuration;
 		#endregion
 
 		#region 构造函数
@@ -48,40 +48,40 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(option == null)
 				throw new ArgumentNullException("option");
 
-			_option = option;
+			_configuration = option;
 			_queues = new ConcurrentDictionary<string, MessageQueue>(StringComparer.OrdinalIgnoreCase);
 		}
 		#endregion
 
 		#region 公共属性
-		public MessageQueueServiceCenter ServiceCenter
-		{
-			get
-			{
-				return MessageQueueServiceCenter.GetInstance(_option.Name, _option.IsInternal);
-			}
-		}
-
 		public ICertification Certification
 		{
 			get
 			{
-				return _option.Certification;
+				return _configuration.Certification;
 			}
 		}
 
-		public Options.Configuration.GeneralConfiguration Option
+		public Options.IConfiguration Configuration
 		{
 			get
 			{
-				return _option;
+				return _configuration;
 			}
 			set
 			{
 				if(value == null)
 					throw new ArgumentNullException();
 
-				_option = value;
+				_configuration = value;
+			}
+		}
+
+		public MessageQueueServiceCenter ServiceCenter
+		{
+			get
+			{
+				return MessageQueueServiceCenter.GetInstance(_configuration.Name, _configuration.IsInternal);
 			}
 		}
 
@@ -105,25 +105,22 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 
 			return _queues.GetOrAdd(name, key => new MessageQueue(this, name));
 		}
+		#endregion
 
-		public string GetRequestUrl(params string[] parts)
+		#region	内部方法
+		internal string GetRequestUrl(params string[] parts)
 		{
+			var configuration = this.Configuration;
+
+			if(configuration == null)
+				throw new InvalidOperationException("Missing required configuration.");
+
 			var path = parts == null ? string.Empty : string.Join("/", parts);
 
 			if(string.IsNullOrEmpty(path))
-				return string.Format("http://{0}.{1}/queues", this.GetAccountName(), this.ServiceCenter.Path);
+				return string.Format("http://{0}.{1}/queues", configuration.Messaging.Name, this.ServiceCenter.Path);
 			else
-				return string.Format("http://{0}.{1}/queues/{2}", this.GetAccountName(), this.ServiceCenter.Path, path);
-		}
-		#endregion
-
-		#region 私有方法
-		private string GetAccountName()
-		{
-			if(_option == null)
-				throw new InvalidProgramException();
-
-			return _option.Messaging.Name;
+				return string.Format("http://{0}.{1}/queues/{2}", configuration.Messaging.Name, this.ServiceCenter.Path, path);
 		}
 		#endregion
 	}

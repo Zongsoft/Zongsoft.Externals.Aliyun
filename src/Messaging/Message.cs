@@ -62,10 +62,10 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(string.IsNullOrEmpty(this.AcknowledgementId))
 				return false;
 
-			var client = _queue.CreateHttpClient();
+			var http = _queue.Http;
 			var request = new HttpRequestMessage(HttpMethod.Delete, _queue.GetRequestUrl("messages") + "?ReceiptHandle=" + Uri.EscapeDataString(this.AcknowledgementId));
 			request.Headers.Add("x-mns-version", "2015-06-06");
-			var response = await client.SendAsync(request);
+			var response = await http.SendAsync(request);
 			return response.IsSuccessStatusCode;
 		}
 
@@ -74,10 +74,10 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(string.IsNullOrEmpty(this.AcknowledgementId))
 				return this.Expires;
 
-			var client = _queue.CreateHttpClient();
+			var http = _queue.Http;
 			var request = new HttpRequestMessage(HttpMethod.Put, _queue.GetRequestUrl("messages") + "?ReceiptHandle=" + Uri.EscapeDataString(this.AcknowledgementId) + "&VisibilityTimeout=" + duration.TotalSeconds.ToString());
 			request.Headers.Add("x-mns-version", "2015-06-06");
-			var response = await client.SendAsync(request);
+			var response = await http.SendAsync(request);
 
 			if(!response.IsSuccessStatusCode)
 			{
@@ -99,7 +99,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 						this.AcknowledgementId = match.Groups["value"].Value;
 						break;
 					case "NextVisibleTime":
-						this.Expires = Utility.GetExpiresTimeFromMilliseconds(match.Groups["value"].Value);
+						this.Expires = Utility.GetDateTimeFromEpoch(match.Groups["value"].Value);
 						break;
 				}
 			}

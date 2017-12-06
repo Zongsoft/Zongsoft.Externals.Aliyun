@@ -31,9 +31,11 @@ using System.Xml;
 
 namespace Zongsoft.Externals.Aliyun
 {
-	internal static class Utility
+	public static class Utility
 	{
-		public static readonly DateTime MINIMUM_EXPIRES = new DateTime(1970, 1, 1);
+		#region 常量定义
+		private static readonly DateTime EPOCH = new DateTime(1970, 1, 1);
+		#endregion
 
 		/// <summary>
 		/// 将本地时间转换成GMT格式的时间文本。
@@ -45,22 +47,19 @@ namespace Zongsoft.Externals.Aliyun
 			return (datetime.HasValue ? datetime.Value : DateTime.Now).ToUniversalTime().ToString("r");
 		}
 
-		public static long GetExpiresSeconds(DateTime datetime)
+		public static DateTime GetDateTimeFromEpoch(int milliseconds)
 		{
-			if(datetime < MINIMUM_EXPIRES)
-				throw new ArgumentOutOfRangeException("datetime");
-
-			return (long)(datetime - MINIMUM_EXPIRES).TotalSeconds;
+			return EPOCH.AddMilliseconds(milliseconds);
 		}
 
-		public static DateTime GetExpiresTimeFromMilliseconds(string totalMilliseconds)
+		public static DateTime GetDateTimeFromEpoch(string milliseconds)
 		{
 			double number;
 
-			if(Zongsoft.Common.Convert.TryConvertValue(totalMilliseconds, out number))
-				return MINIMUM_EXPIRES.AddMilliseconds(number);
+			if(Zongsoft.Common.Convert.TryConvertValue(milliseconds, out number))
+				return EPOCH.AddMilliseconds(number);
 			else
-				throw new ArgumentException(string.Format("Invalid '{0}' value of 'totalMilliseconds' argument.", totalMilliseconds));
+				throw new ArgumentException(string.Format("Invalid '{0}' value of 'totalMilliseconds' argument.", milliseconds));
 		}
 
 		public static TimeSpan? GetDuration(object parameter, DateTime baseTime)

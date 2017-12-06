@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<plugin name="Zongsoft.Externals.Aliyun.Web"
+        title="Zongsoft.Externals.Aliyun.Web Plugin"
+        author="Zongsoft Corporation"
+        version="1.0"
+        description="Create by: Popeye Zhong at 2017-11-30" >
+
+	<manifest>
+		<dependencies>
+			<dependency name="Zongsoft.Externals.Aliyun" />
+		</dependencies>
+
+		<assemblies>
+			<assembly name="Zongsoft.Externals.Aliyun.Web" />
+		</assemblies>
+	</manifest>
+
+	<extension path="/Workbench/Web/Routes">
+		<route name="Aliyun-Topics" kind="api"
+		       url="aliyun/topics/{controller}/{action}"
+		       constraints="action=^[A-Za-z]+\w*$"
+		       defaults="action="
+		       position="Api" />
+	</extension>
+
+	<extension path="/Workspace/Web/Controllers/Aliyun/Topics">
+		<object name="Fallback" topics="{srv:~}" type="Zongsoft.Externals.Aliyun.Messaging.Web.FallbackController, Zongsoft.Externals.Aliyun.Web" />
+	</extension>
+</plugin>

@@ -32,7 +32,7 @@ using Zongsoft.Options.Configuration;
 
 namespace Zongsoft.Externals.Aliyun.Options.Configuration
 {
-	public class MessagingConfigurationElement : OptionConfigurationElement
+	public class MessagingConfigurationElement : OptionConfigurationElement, IMessagingConfiguration
 	{
 		#region 常量定义
 		private const string XML_NAME_ATTRIBUTE = "name";

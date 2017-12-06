@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -29,42 +29,17 @@ using System;
 namespace Zongsoft.Externals.Aliyun.Options
 {
 	/// <summary>
-	/// 表示阿里云的配置接口。
+	/// 表示阿里云消息队列(MNS)的配置信息。
 	/// </summary>
-	public interface IConfiguration
+	public interface IMessagingConfiguration
 	{
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取或设置消息队列的账号名。
 		/// </summary>
-		ServiceCenterName Name
+		string Name
 		{
 			get;
 			set;
-		}
-
-		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
-		/// </summary>
-		bool IsInternal
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取配置的凭证对象。
-		/// </summary>
-		ICertification Certification
-		{
-			get;
-		}
-
-		/// <summary>
-		/// 获取消息队列(MNS)的配置信息。
-		/// </summary>
-		IMessagingConfiguration Messaging
-		{
-			get;
 		}
 	}
 }
