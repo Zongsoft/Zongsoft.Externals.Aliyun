@@ -50,7 +50,6 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		private TopicProvider _provider;
 		private TopicInfo _info;
 		private TopicSubscription _subscription;
-		private IExecutor _executor;
 		#endregion
 
 		#region 构造函数
@@ -76,23 +75,6 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			get
 			{
 				return _name;
-			}
-		}
-
-		public IExecutor Executor
-		{
-			get
-			{
-				if(_executor == null)
-				{
-					lock(this)
-					{
-						if(_executor == null)
-							_executor = new Executor(this);
-					}
-				}
-
-				return _executor;
 			}
 		}
 
