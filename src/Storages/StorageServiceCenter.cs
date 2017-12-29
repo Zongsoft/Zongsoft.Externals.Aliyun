@@ -32,7 +32,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 	/// <summary>
 	/// 表示存储服务中心的类。
 	/// </summary>
-	public class StorageServiceCenter : ServiceCenter
+	public class StorageServiceCenter : ServiceCenterBase
 	{
 		#region 常量定义
 		//中国存储服务中心访问地址的前缀常量
@@ -42,27 +42,10 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		private const string OSS_US_PREFIX = "oss-us-";
 		#endregion
 
-		#region 成员字段
-		private StorageClient _client;
-		#endregion
-
 		#region 构造函数
 		private StorageServiceCenter(ServiceCenterName name, bool isInternal) : base(name, isInternal)
 		{
 			this.Path = OSS_CN_PREFIX + base.Path;
-		}
-		#endregion
-
-		#region 公共属性
-		public StorageClient Client
-		{
-			get
-			{
-				if(_client == null)
-					System.Threading.Interlocked.CompareExchange(ref _client, new StorageClient(this), null);
-
-				return _client;
-			}
 		}
 		#endregion
 
@@ -102,15 +85,15 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			switch(name)
 			{
 				case ServiceCenterName.Beijing:
-					return isInternal ? Internal.Beijing : Public.Beijing;
+					return isInternal ? Internal.Beijing : External.Beijing;
 				case ServiceCenterName.Qingdao:
-					return isInternal ? Internal.Qingdao : Public.Qingdao;
+					return isInternal ? Internal.Qingdao : External.Qingdao;
 				case ServiceCenterName.Hangzhou:
-					return isInternal ? Internal.Hangzhou : Public.Hangzhou;
+					return isInternal ? Internal.Hangzhou : External.Hangzhou;
 				case ServiceCenterName.Shenzhen:
-					return isInternal ? Internal.Shenzhen : Public.Shenzhen;
+					return isInternal ? Internal.Shenzhen : External.Shenzhen;
 				case ServiceCenterName.Hongkong:
-					return isInternal ? Internal.Hongkong : Public.Hongkong;
+					return isInternal ? Internal.Hongkong : External.Hongkong;
 			}
 
 			throw new NotSupportedException();
@@ -121,7 +104,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		private void ResolvePath(string path, out string bucketName, out string resourcePath)
 		{
 			if(string.IsNullOrWhiteSpace(path))
-				throw new ArgumentNullException("path");
+				throw new ArgumentNullException(nameof(path));
 
 			path = path.Trim();
 			var parts = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -136,7 +119,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		#endregion
 
 		#region 嵌套子类
-		public static class Public
+		public static class External
 		{
 			/// <summary>北京存储服务中心的外部访问地址</summary>
 			public static readonly StorageServiceCenter Beijing = new StorageServiceCenter(ServiceCenterName.Beijing, false);

@@ -25,38 +25,60 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Sms.Options
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示短信模板的配置项接口。
 	/// </summary>
-	public interface IConfiguration
+	public interface ITemplateOption
 	{
+		#region 公共属性
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取或设置模板的名称。
 		/// </summary>
-		ServiceCenterName Name
+		string Name
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取或设置模板的代号。
 		/// </summary>
-		bool IsInternal
+		string Code
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取阿里云的凭证提供程序。
+		/// 获取或设置模板的方案（即阿里云的短信签名）。
 		/// </summary>
-		ICertificateProvider Certificates
+		string Scheme
 		{
 			get;
+			set;
 		}
+
+		/// <summary>
+		/// 获取或设置模板所属的运营商区域。
+		/// </summary>
+		ServiceCenterName? Region
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置模板关联的凭证名。
+		/// </summary>
+		string Certificate
+		{
+			get;
+			set;
+		}
+		#endregion
 	}
 }

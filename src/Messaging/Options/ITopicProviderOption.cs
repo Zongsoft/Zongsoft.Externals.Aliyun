@@ -25,28 +25,30 @@
  */
 
 using System;
-using System.ComponentModel;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Messaging.Options
 {
 	/// <summary>
-	/// 关于移动推送目标种类(推送方式)的枚举。
+	/// 表示阿里云消息主题提供程序的配置项接口。
 	/// </summary>
-	public enum NotificationTargetType
+	public interface ITopicProviderOption : Collections.INamedCollection<ITopicOption>
 	{
-		/// <summary>所有</summary>
-		All,
+		/// <summary>
+		/// 获取或设置提供程序所在的服务区域名。
+		/// </summary>
+		ServiceCenterName? Region
+		{
+			get;
+			set;
+		}
 
-		/// <summary>设备</summary>
-		Device,
-
-		/// <summary>账号</summary>
-		Account,
-
-		/// <summary>别名</summary>
-		Alias,
-
-		/// <summary>标签</summary>
-		Tag,
+		/// <summary>
+		/// 获取或设置提供程序默认的凭证名。
+		/// </summary>
+		string Certificate
+		{
+			get;
+			set;
+		}
 	}
 }

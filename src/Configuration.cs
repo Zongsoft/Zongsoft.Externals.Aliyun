@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -26,37 +26,40 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示本应用的配置类。
 	/// </summary>
-	public interface IConfiguration
+	public static class Configuration
 	{
-		/// <summary>
-		/// 获取或设置配置的服务中心。
-		/// </summary>
-		ServiceCenterName Name
-		{
-			get;
-			set;
-		}
+		#region 成员字段
+		private static Options.IConfiguration _instance;
+		#endregion
 
+		#region	公共属性
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取或设置本应用的配置对象。
 		/// </summary>
-		bool IsInternal
+		public static Options.IConfiguration Instance
 		{
-			get;
-			set;
-		}
+			get
+			{
+				if(_instance == null)
+				{
+					_instance = Zongsoft.Options.OptionManager.Default.GetOptionValue("/Externals/Aliyun/General") as Options.IConfiguration;
 
-		/// <summary>
-		/// 获取阿里云的凭证提供程序。
-		/// </summary>
-		ICertificateProvider Certificates
-		{
-			get;
+					if(_instance == null)
+						throw new InvalidOperationException("Missing required configuation of the Aliyun.");
+				}
+
+				return _instance;
+			}
+			set
+			{
+				_instance = value ?? throw new ArgumentNullException();
+			}
 		}
+		#endregion
 	}
 }

@@ -32,58 +32,54 @@ using Zongsoft.Options.Configuration;
 
 namespace Zongsoft.Externals.Aliyun.Options.Configuration
 {
-	public class GeneralConfiguration : OptionConfigurationElement, IConfiguration
+	public class CertificateElementCollection : OptionConfigurationElementCollection<CertificateElement, ICertificate>, ICertificateProvider
 	{
 		#region 常量定义
-		private const string XML_NAME_ATTRIBUTE = "name";
-		private const string XML_INTERNAL_ATTRIBUTE = "internal";
-
-		private const string XML_SETTINGS_COLLECTION = "settings";
-		private const string XML_CERTIFICATES_COLLECTION = "certificates";
+		private const string XML_DEFAULT_ATTRIBUTE = "default";
+		private const string XML_CERTIFICATE_ELEMENT = "certificate";
 		#endregion
 
 		#region 公共属性
-		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsRequired)]
-		public ServiceCenterName Name
+		[OptionConfigurationProperty(XML_DEFAULT_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
+		public string Default
 		{
 			get
 			{
-				return (ServiceCenterName)this[XML_NAME_ATTRIBUTE];
+				return (string)this.GetAttributeValue(XML_DEFAULT_ATTRIBUTE);
 			}
 			set
 			{
-				this[XML_NAME_ATTRIBUTE] = value;
+				this.SetAttributeValue(XML_DEFAULT_ATTRIBUTE, value);
 			}
 		}
+		#endregion
 
-		[OptionConfigurationProperty(XML_INTERNAL_ATTRIBUTE, DefaultValue = false)]
-		public bool IsInternal
+		#region 重写方法
+		protected override string ElementName
 		{
 			get
 			{
-				return (bool)this[XML_INTERNAL_ATTRIBUTE];
-			}
-			set
-			{
-				this[XML_INTERNAL_ATTRIBUTE] = value;
+				return XML_CERTIFICATE_ELEMENT;
 			}
 		}
 
-		[OptionConfigurationProperty(XML_CERTIFICATES_COLLECTION, Type = typeof(CertificateElementCollection))]
-		public ICertificateProvider Certificates
+		protected override string GetElementKey(OptionConfigurationElement element)
 		{
-			get
-			{
-				return (ICertificateProvider)this[XML_CERTIFICATES_COLLECTION];
-			}
+			return ((CertificateElement)element).Name;
 		}
+		#endregion
 
-		[OptionConfigurationProperty(XML_SETTINGS_COLLECTION, Type = typeof(SettingElementCollection))]
-		public ISettingsProvider Settings
+		#region 接口实现
+		ICertificate ICertificateProvider.Default
 		{
 			get
 			{
-				return (ISettingsProvider)this[XML_SETTINGS_COLLECTION];
+				var name = (string)this.GetAttributeValue(XML_DEFAULT_ATTRIBUTE);
+
+				if(string.IsNullOrEmpty(name))
+					return null;
+
+				return (ICertificate)this.GetElement(name);
 			}
 		}
 		#endregion

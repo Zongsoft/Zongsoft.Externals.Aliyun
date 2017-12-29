@@ -26,7 +26,7 @@ namespace Zongsoft.Externals.Aliyun.Tests.Messaging
 		public MessageQueueTests()
 		{
 			var configuration = Zongsoft.Options.Configuration.OptionConfiguration.Load(@"\Zongsoft\Zongsoft.Externals.Aliyun\src\Zongsoft.Externals.Aliyun.option");
-			var option = configuration.GetOptionValue("Externals/Aliyun/General") as Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration;
+			var option = configuration.GetOptionValue("Externals/Aliyun/Messaging") as Zongsoft.Externals.Aliyun.Messaging.Options.IConfiguration;
 
 			_provider = new MessageQueueProvider(option);
 		}

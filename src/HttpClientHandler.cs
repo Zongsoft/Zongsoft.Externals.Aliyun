@@ -35,21 +35,15 @@ namespace Zongsoft.Externals.Aliyun
 	internal class HttpClientHandler : System.Net.Http.HttpClientHandler
 	{
 		#region 成员字段
-		private ICertification _certification;
+		private ICertificate _certificate;
 		private HttpAuthenticator _authenticator;
 		#endregion
 
 		#region 构造函数
-		public HttpClientHandler(ICertification certification, HttpAuthenticator authenticator)
+		public HttpClientHandler(ICertificate certificate, HttpAuthenticator authenticator)
 		{
-			if(certification == null)
-				throw new ArgumentNullException("certification");
-
-			if(authenticator == null)
-				throw new ArgumentNullException("authenticator");
-
-			_certification = certification;
-			_authenticator = authenticator;
+			_certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
+			_authenticator = authenticator ?? throw new ArgumentNullException(nameof(authenticator));
 		}
 		#endregion
 
@@ -61,11 +55,11 @@ namespace Zongsoft.Externals.Aliyun
 			switch(_authenticator.SignatureMode)
 			{
 				case HttpSignatureMode.Header:
-					request.Headers.Authorization = new AuthenticationHeaderValue(_authenticator.Name, _certification.Name + ":" + _authenticator.Signature(request, _certification.Secret));
+					request.Headers.Authorization = new AuthenticationHeaderValue(_authenticator.Name, _certificate.Name + ":" + _authenticator.Signature(request, _certificate.Secret));
 					break;
 				case HttpSignatureMode.Parameter:
 					var delimiter = string.IsNullOrWhiteSpace(request.RequestUri.Query) ? "?" : "&";
-					var signature = Uri.EscapeDataString(_authenticator.Signature(request, _certification.Secret));
+					var signature = Uri.EscapeDataString(_authenticator.Signature(request, _certificate.Secret));
 
 					request.RequestUri = new Uri(
 						request.RequestUri.Scheme + "://" +

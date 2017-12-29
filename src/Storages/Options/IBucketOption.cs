@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -25,21 +25,42 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Storages.Options
 {
 	/// <summary>
-	/// 表示阿里云消息队列(MNS)的配置信息。
+	/// 表示存储器(Bucket)的配置项接口。
 	/// </summary>
-	public interface IMessagingConfiguration
+	public interface IBucketOption
 	{
+		#region 公共属性
 		/// <summary>
-		/// 获取或设置消息队列的账号名。
+		/// 获取或设置存储器的名称。
 		/// </summary>
 		string Name
 		{
 			get;
 			set;
 		}
+
+		/// <summary>
+		/// 获取或设置存储器所属的运营商区域。
+		/// </summary>
+		ServiceCenterName? Region
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置存储器关联的凭证名。
+		/// </summary>
+		string Certificate
+		{
+			get;
+			set;
+		}
+		#endregion
 	}
 }

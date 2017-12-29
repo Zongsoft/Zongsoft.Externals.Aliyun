@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -30,26 +30,26 @@ using System.Collections.Generic;
 using Zongsoft.Options;
 using Zongsoft.Options.Configuration;
 
-namespace Zongsoft.Externals.Aliyun.Options.Configuration
+namespace Zongsoft.Externals.Aliyun.Sms.Options.Configuration
 {
-	public class MessagingConfigurationElement : OptionConfigurationElement, IMessagingConfiguration
+	public class TemplateElementCollection : OptionConfigurationElementCollection<TemplateElement, ITemplateOption>
 	{
 		#region 常量定义
-		private const string XML_NAME_ATTRIBUTE = "name";
+		private const string XML_TEMPLATE_ELEMENT = "template";
 		#endregion
 
-		#region 公共属性
-		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsRequired)]
-		public string Name
+		#region 重写方法
+		protected override string ElementName
 		{
 			get
 			{
-				return (string)this[XML_NAME_ATTRIBUTE];
+				return XML_TEMPLATE_ELEMENT;
 			}
-			set
-			{
-				this[XML_NAME_ATTRIBUTE] = value;
-			}
+		}
+
+		protected override string GetElementKey(OptionConfigurationElement element)
+		{
+			return ((TemplateElement)element).Name;
 		}
 		#endregion
 	}

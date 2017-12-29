@@ -30,25 +30,25 @@ using System.Collections.Generic;
 using Zongsoft.Options;
 using Zongsoft.Options.Configuration;
 
-namespace Zongsoft.Externals.Aliyun.Options.Configuration
+namespace Zongsoft.Externals.Aliyun.Sms.Options.Configuration
 {
-	public class GeneralConfiguration : OptionConfigurationElement, IConfiguration
+	public class TemplateElement : OptionConfigurationElement, ITemplateOption
 	{
 		#region 常量定义
 		private const string XML_NAME_ATTRIBUTE = "name";
-		private const string XML_INTERNAL_ATTRIBUTE = "internal";
-
-		private const string XML_SETTINGS_COLLECTION = "settings";
-		private const string XML_CERTIFICATES_COLLECTION = "certificates";
+		private const string XML_CODE_ATTRIBUTE = "code";
+		private const string XML_SCHEME_ATTRIBUTE = "scheme";
+		private const string XML_REGION_ATTRIBUTE = "region";
+		private const string XML_CERTIFICATE_ATTRIBUTE = "certificate";
 		#endregion
 
 		#region 公共属性
-		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsRequired)]
-		public ServiceCenterName Name
+		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsKey)]
+		public string Name
 		{
 			get
 			{
-				return (ServiceCenterName)this[XML_NAME_ATTRIBUTE];
+				return (string)this[XML_NAME_ATTRIBUTE];
 			}
 			set
 			{
@@ -56,34 +56,55 @@ namespace Zongsoft.Externals.Aliyun.Options.Configuration
 			}
 		}
 
-		[OptionConfigurationProperty(XML_INTERNAL_ATTRIBUTE, DefaultValue = false)]
-		public bool IsInternal
+		[OptionConfigurationProperty(XML_CODE_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
+		public string Code
 		{
 			get
 			{
-				return (bool)this[XML_INTERNAL_ATTRIBUTE];
+				return (string)this[XML_CODE_ATTRIBUTE];
 			}
 			set
 			{
-				this[XML_INTERNAL_ATTRIBUTE] = value;
+				this[XML_CODE_ATTRIBUTE] = value;
 			}
 		}
 
-		[OptionConfigurationProperty(XML_CERTIFICATES_COLLECTION, Type = typeof(CertificateElementCollection))]
-		public ICertificateProvider Certificates
+		[OptionConfigurationProperty(XML_SCHEME_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
+		public string Scheme
 		{
 			get
 			{
-				return (ICertificateProvider)this[XML_CERTIFICATES_COLLECTION];
+				return (string)this[XML_SCHEME_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_SCHEME_ATTRIBUTE] = value;
 			}
 		}
 
-		[OptionConfigurationProperty(XML_SETTINGS_COLLECTION, Type = typeof(SettingElementCollection))]
-		public ISettingsProvider Settings
+		[OptionConfigurationProperty(XML_REGION_ATTRIBUTE, null)]
+		public ServiceCenterName? Region
 		{
 			get
 			{
-				return (ISettingsProvider)this[XML_SETTINGS_COLLECTION];
+				return (ServiceCenterName?)this[XML_REGION_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_REGION_ATTRIBUTE] = value;
+			}
+		}
+
+		[OptionConfigurationProperty(XML_CERTIFICATE_ATTRIBUTE)]
+		public string Certificate
+		{
+			get
+			{
+				return (string)this[XML_CERTIFICATE_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_CERTIFICATE_ATTRIBUTE] = value;
 			}
 		}
 		#endregion

@@ -51,11 +51,8 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#region 构造函数
 		internal MessageQueue(MessageQueueProvider provider, string name) : base(name)
 		{
-			if(provider == null)
-				throw new ArgumentNullException("provider");
-
-			_provider = provider;
-			_http = new HttpClient(new HttpClientHandler(_provider.Certification, MessageQueueAuthenticator.Instance));
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
+			_http = new HttpClient(new HttpClientHandler(_provider.GetCertificate(name), MessageQueueAuthenticator.Instance));
 		}
 		#endregion
 
@@ -293,7 +290,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(parts != null && parts.Length > 0)
 				Array.Copy(parts, 0, args, 1, parts.Length);
 
-			return _provider.GetRequestUrl(args);
+			return _provider.GetRequestUrl(this.Name, args);
 		}
 		#endregion
 	}

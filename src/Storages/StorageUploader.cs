@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -27,13 +27,10 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Threading;
 
 namespace Zongsoft.Externals.Aliyun.Storages
 {
@@ -57,7 +54,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		private List<StorageMultipart> _multiparts;
 		private IDictionary<string, object> _extendedProperties;
 		private StorageClient _client;
-		private HttpClient _http;
 
 		private int _isFinish;
 		private int _isDisposed;
@@ -232,7 +228,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 
 			try
 			{
-				_http.PostAsync(_client.ServiceCenter.GetRequestUrl(_path + "?uploadId=" + _id), new System.Net.Http.StringContent(text.ToString())).ContinueWith(t =>
+				_client.HttpClient.PostAsync(_client.ServiceCenter.GetRequestUrl(_path + "?uploadId=" + _id), new System.Net.Http.StringContent(text.ToString())).ContinueWith(t =>
 				{
 					t.Result.EnsureSuccessStatusCode();
 
@@ -257,13 +253,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				//重抛异常
 				throw;
 			}
-			finally
-			{
-				var http = _http;
-
-				if(http != null)
-					http.DefaultRequestHeaders.ConnectionClose = false;
-			}
 		}
 
 		public void Abort()
@@ -274,9 +263,9 @@ namespace Zongsoft.Externals.Aliyun.Storages
 
 			try
 			{
-				_http.DefaultRequestHeaders.ConnectionClose = true;
+				_client.HttpClient.DefaultRequestHeaders.ConnectionClose = true;
 
-				_http.DeleteAsync(_client.ServiceCenter.GetRequestUrl(_path + "?uploadId=" + _id)).ContinueWith(t =>
+				_client.HttpClient.DeleteAsync(_client.ServiceCenter.GetRequestUrl(_path + "?uploadId=" + _id)).ContinueWith(t =>
 				{
 					t.Result.EnsureSuccessStatusCode();
 
@@ -298,13 +287,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				//重抛异常
 				throw;
 			}
-			finally
-			{
-				var http = _http;
-
-				if(http != null)
-					http.DefaultRequestHeaders.ConnectionClose = false;
-			}
 		}
 		#endregion
 
@@ -315,16 +297,13 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			if(!string.IsNullOrWhiteSpace(_id))
 				return;
 
-			//由于该方法可能会重入，所以确保HttpClient只被创建一次
-			Interlocked.CompareExchange(ref _http, _client.CreateHttpClient(), null);
-
 			//创建初始化请求包
 			var request = _client.CreateHttpRequest(HttpMethod.Post, _path + "?uploads", _client.EnsureCreatedTime(_extendedProperties));
 
 			//保持长连接
 			request.Headers.Connection.Add("keep-alive");
 
-			_http.SendAsync(request).ContinueWith(t =>
+			_client.HttpClient.SendAsync(request).ContinueWith(t =>
 			{
 				//初始化方法必须确保返回状态是成功的
 				t.Result.EnsureSuccessStatusCode();
@@ -388,7 +367,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			//设置请求内容
 			request.Content = new ByteArrayContent(_buffer, 0, count);
 
-			return _http.SendAsync(request).ContinueWith(t =>
+			return _client.HttpClient.SendAsync(request).ContinueWith(t =>
 			{
 				if(t.Result.IsSuccessStatusCode)
 				{
@@ -458,11 +437,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				_multiparts = null;
 				_extendedProperties = null;
 				_client = null;
-
-				var http = _http;
-
-				if(http != null)
-					http.Dispose();
 			}
 		}
 		#endregion

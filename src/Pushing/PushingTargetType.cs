@@ -25,38 +25,28 @@
  */
 
 using System;
+using System.ComponentModel;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Pushing
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 关于移动推送目标种类(推送方式)的枚举。
 	/// </summary>
-	public interface IConfiguration
+	public enum PushingTargetType
 	{
-		/// <summary>
-		/// 获取或设置配置的服务中心。
-		/// </summary>
-		ServiceCenterName Name
-		{
-			get;
-			set;
-		}
+		/// <summary>所有</summary>
+		All,
 
-		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
-		/// </summary>
-		bool IsInternal
-		{
-			get;
-			set;
-		}
+		/// <summary>设备</summary>
+		Device,
 
-		/// <summary>
-		/// 获取阿里云的凭证提供程序。
-		/// </summary>
-		ICertificateProvider Certificates
-		{
-			get;
-		}
+		/// <summary>账号</summary>
+		Account,
+
+		/// <summary>别名</summary>
+		Alias,
+
+		/// <summary>标签</summary>
+		Tag,
 	}
 }

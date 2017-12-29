@@ -27,10 +27,22 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Pushing
 {
-	public class NotificationResult
+	public class PushingResult
 	{
+		#region 构造函数
+		public PushingResult()
+		{
+		}
+
+		public PushingResult(string code, string message)
+		{
+			this.Code = code;
+			this.Message = message;
+		}
+		#endregion
+
 		#region 公共属性
 		public string RequestId
 		{

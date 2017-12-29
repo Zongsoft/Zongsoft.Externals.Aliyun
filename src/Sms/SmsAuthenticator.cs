@@ -25,38 +25,44 @@
  */
 
 using System;
+using System.Net.Http;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Sms
 {
-	/// <summary>
-	/// 表示阿里云的常规配置接口。
-	/// </summary>
-	public interface IConfiguration
+	public class SmsAuthenticator : HttpAuthenticator
 	{
-		/// <summary>
-		/// 获取或设置配置的服务中心。
-		/// </summary>
-		ServiceCenterName Name
+		#region 单例字段
+		public static SmsAuthenticator Instance = new SmsAuthenticator();
+		#endregion
+
+		#region 私有构造
+		private SmsAuthenticator() : base("Signature", HttpSignatureMode.Parameter)
 		{
-			get;
-			set;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string Signature(HttpRequestMessage request, string secret)
+		{
+			return base.Signature(request, secret + "&");
 		}
 
-		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
-		/// </summary>
-		bool IsInternal
+		protected override string Canonicalize(HttpRequestMessage request)
 		{
-			get;
-			set;
+			var canonicalizedString = base.Canonicalize(request);
+
+			return request.Method.Method + "&%2F&" + Uri.EscapeDataString(canonicalizedString);
 		}
 
-		/// <summary>
-		/// 获取阿里云的凭证提供程序。
-		/// </summary>
-		ICertificateProvider Certificates
+		protected override string CanonicalizeHeaders(HttpRequestMessage request)
 		{
-			get;
+			return null;
 		}
+
+		protected override string CanonicalizeResource(HttpRequestMessage request)
+		{
+			return this.CanonicalizeQuery(request.RequestUri, tx => tx.Replace("%7E", "~"));
+		}
+		#endregion
 	}
 }

@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -30,17 +30,20 @@ using System.Collections.Generic;
 using Zongsoft.Options;
 using Zongsoft.Options.Configuration;
 
-namespace Zongsoft.Externals.Aliyun.Options.Configuration
+namespace Zongsoft.Externals.Aliyun.Pushing.Options.Configuration
 {
-	public class CertificationConfigurationElement : OptionConfigurationElement, ICertification
+	public class AppElement : OptionConfigurationElement, IAppOption
 	{
 		#region 常量定义
 		private const string XML_NAME_ATTRIBUTE = "name";
+		private const string XML_CODE_ATTRIBUTE = "code";
 		private const string XML_SECRET_ATTRIBUTE = "secret";
+		private const string XML_REGION_ATTRIBUTE = "region";
+		private const string XML_CERTIFICATE_ATTRIBUTE = "certificate";
 		#endregion
 
 		#region 公共属性
-		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsRequired)]
+		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsKey)]
 		public string Name
 		{
 			get
@@ -53,7 +56,20 @@ namespace Zongsoft.Externals.Aliyun.Options.Configuration
 			}
 		}
 
-		[OptionConfigurationProperty(XML_SECRET_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsRequired)]
+		[OptionConfigurationProperty(XML_CODE_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
+		public string Code
+		{
+			get
+			{
+				return (string)this[XML_CODE_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_CODE_ATTRIBUTE] = value;
+			}
+		}
+
+		[OptionConfigurationProperty(XML_SECRET_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
 		public string Secret
 		{
 			get
@@ -63,6 +79,32 @@ namespace Zongsoft.Externals.Aliyun.Options.Configuration
 			set
 			{
 				this[XML_SECRET_ATTRIBUTE] = value;
+			}
+		}
+
+		[OptionConfigurationProperty(XML_REGION_ATTRIBUTE, null)]
+		public ServiceCenterName? Region
+		{
+			get
+			{
+				return (ServiceCenterName?)this[XML_REGION_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_REGION_ATTRIBUTE] = value;
+			}
+		}
+
+		[OptionConfigurationProperty(XML_CERTIFICATE_ATTRIBUTE)]
+		public string Certificate
+		{
+			get
+			{
+				return (string)this[XML_CERTIFICATE_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_CERTIFICATE_ATTRIBUTE] = value;
 			}
 		}
 		#endregion

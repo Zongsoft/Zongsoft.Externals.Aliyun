@@ -159,6 +159,51 @@ namespace Zongsoft.Externals.Aliyun
 		}
 		#endregion
 
+		#region 保护方法
+		protected string CanonicalizeQuery(Uri url, Action<StringBuilder> onCanonicalized = null)
+		{
+			if(url == null || string.IsNullOrEmpty(url.Query))
+				return null;
+
+			var parts = url.Query.TrimStart('?').Split('&');
+			var dictionary = new SortedDictionary<string, string>(StringComparer.Ordinal);
+			string key, value;
+
+			foreach(var part in parts)
+			{
+				var index = part.IndexOf('=');
+
+				if(index > 0)
+				{
+					key = Uri.UnescapeDataString(part.Substring(0, index));
+					value = index < part.Length - 1 ? Uri.UnescapeDataString(part.Substring(index + 1)) : null;
+				}
+				else
+				{
+					key = Uri.UnescapeDataString(part);
+					value = null;
+				}
+
+				dictionary[key] = value;
+			}
+
+			var text = new StringBuilder((int)Math.Ceiling(url.Query.Length * 1.5));
+
+			foreach(var entry in dictionary)
+			{
+				if(text.Length > 0)
+					text.Append("&");
+
+				text.Append(Uri.EscapeDataString(entry.Key) + "=" + Uri.EscapeDataString(entry.Value));
+			}
+
+			if(onCanonicalized != null)
+				onCanonicalized(text);
+
+			return text.ToString();
+		}
+		#endregion
+
 		#region 私有方法
 		private string JoinValues(string originalValue, IEnumerable<string> values)
 		{

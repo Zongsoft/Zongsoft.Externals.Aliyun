@@ -25,36 +25,37 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Storages.Options
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示阿里云对象存储(OSS)相关的配置接口。
 	/// </summary>
 	public interface IConfiguration
 	{
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取或设置对象存储所属的服务区域。
 		/// </summary>
-		ServiceCenterName Name
+		ServiceCenterName? Region
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取或设置关联的凭证名。
 		/// </summary>
-		bool IsInternal
+		string Certificate
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取阿里云的凭证提供程序。
+		/// 获取存储器配置项集合。
 		/// </summary>
-		ICertificateProvider Certificates
+		Collections.INamedCollection<IBucketOption> Buckets
 		{
 			get;
 		}

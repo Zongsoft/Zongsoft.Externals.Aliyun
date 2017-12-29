@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -42,9 +42,17 @@ namespace Zongsoft.Externals.Aliyun
 		/// </summary>
 		/// <param name="datetime">本地时间。</param>
 		/// <returns>返回被转换后的GMT格式的时间文本。</returns>
+		/// <remarks>
+		///		<para>如果北京时间为：2017-12-23 17:40:00，则该方法的返回结果为：Sat, 23 Dec 2017 09:40:00 GMT</para>
+		/// </remarks>
 		public static string GetGmtTime(DateTime? datetime = null)
 		{
 			return (datetime.HasValue ? datetime.Value : DateTime.Now).ToUniversalTime().ToString("r");
+		}
+
+		public static string GetTimestamp(DateTime? datetime = null)
+		{
+			return (datetime.HasValue ? datetime.Value : DateTime.Now).ToUniversalTime().ToString("s") + "Z";
 		}
 
 		public static DateTime GetDateTimeFromEpoch(int milliseconds)
@@ -96,6 +104,24 @@ namespace Zongsoft.Externals.Aliyun
 				return duration.Value;
 
 			throw new ArgumentException(string.Format("The '{0}' value of parameter is not supported.", parameter));
+		}
+
+		public static string GetQueryString(IDictionary<string, string> parameters)
+		{
+			if(parameters == null || parameters.Count == 0)
+				return string.Empty;
+
+			var text = new System.Text.StringBuilder();
+
+			foreach(var parameter in parameters)
+			{
+				if(text.Length > 0)
+					text.Append("&");
+
+				text.Append(parameter.Key + "=" + parameter.Value);
+			}
+
+			return text.ToString();
 		}
 
 		/// <summary>

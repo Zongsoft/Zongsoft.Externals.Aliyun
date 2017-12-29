@@ -17,11 +17,11 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		[Xunit.Fact]
 		public void Test()
 		{
-			Assert.Equal(ServiceCenterName.Beijing, StorageServiceCenter.Public.Beijing.Name);
-			Assert.Equal(ServiceCenterName.Qingdao, StorageServiceCenter.Public.Qingdao.Name);
-			Assert.Equal(ServiceCenterName.Hangzhou, StorageServiceCenter.Public.Hangzhou.Name);
-			Assert.Equal(ServiceCenterName.Shenzhen, StorageServiceCenter.Public.Shenzhen.Name);
-			Assert.Equal(ServiceCenterName.Hongkong, StorageServiceCenter.Public.Hongkong.Name);
+			Assert.Equal(ServiceCenterName.Beijing, StorageServiceCenter.External.Beijing.Name);
+			Assert.Equal(ServiceCenterName.Qingdao, StorageServiceCenter.External.Qingdao.Name);
+			Assert.Equal(ServiceCenterName.Hangzhou, StorageServiceCenter.External.Hangzhou.Name);
+			Assert.Equal(ServiceCenterName.Shenzhen, StorageServiceCenter.External.Shenzhen.Name);
+			Assert.Equal(ServiceCenterName.Hongkong, StorageServiceCenter.External.Hongkong.Name);
 
 			Assert.Equal(ServiceCenterName.Beijing, StorageServiceCenter.Internal.Beijing.Name);
 			Assert.Equal(ServiceCenterName.Qingdao, StorageServiceCenter.Internal.Qingdao.Name);
@@ -29,11 +29,11 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 			Assert.Equal(ServiceCenterName.Shenzhen, StorageServiceCenter.Internal.Shenzhen.Name);
 			Assert.Equal(ServiceCenterName.Hongkong, StorageServiceCenter.Internal.Hongkong.Name);
 
-			Assert.Equal(@"oss-cn-beijing.aliyuncs.com", StorageServiceCenter.Public.Beijing.Path);
-			Assert.Equal(@"oss-cn-qingdao.aliyuncs.com", StorageServiceCenter.Public.Qingdao.Path);
-			Assert.Equal(@"oss-cn-hangzhou.aliyuncs.com", StorageServiceCenter.Public.Hangzhou.Path);
-			Assert.Equal(@"oss-cn-shenzhen.aliyuncs.com", StorageServiceCenter.Public.Shenzhen.Path);
-			Assert.Equal(@"oss-cn-hongkong.aliyuncs.com", StorageServiceCenter.Public.Hongkong.Path);
+			Assert.Equal(@"oss-cn-beijing.aliyuncs.com", StorageServiceCenter.External.Beijing.Path);
+			Assert.Equal(@"oss-cn-qingdao.aliyuncs.com", StorageServiceCenter.External.Qingdao.Path);
+			Assert.Equal(@"oss-cn-hangzhou.aliyuncs.com", StorageServiceCenter.External.Hangzhou.Path);
+			Assert.Equal(@"oss-cn-shenzhen.aliyuncs.com", StorageServiceCenter.External.Shenzhen.Path);
+			Assert.Equal(@"oss-cn-hongkong.aliyuncs.com", StorageServiceCenter.External.Hongkong.Path);
 
 			Assert.Equal(@"oss-cn-beijing-internal.aliyuncs.com", StorageServiceCenter.Internal.Beijing.Path);
 			Assert.Equal(@"oss-cn-qingdao-internal.aliyuncs.com", StorageServiceCenter.Internal.Qingdao.Path);
@@ -47,13 +47,13 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		{
 			string resourcePath;
 
-			Assert.Equal(@"http://automao-images.oss-cn-beijing.aliyuncs.com/automao-logo.png", StorageServiceCenter.Public.Beijing.GetRequestUrl(@"/automao-images/automao-logo.png", out resourcePath));
+			Assert.Equal(@"http://automao-images.oss-cn-beijing.aliyuncs.com/automao-logo.png", StorageServiceCenter.External.Beijing.GetRequestUrl(@"/automao-images/automao-logo.png", out resourcePath));
 			Assert.Equal(@"automao-logo.png", resourcePath);
 
-			Assert.Equal(@"http://automao-images.oss-cn-beijing.aliyuncs.com/SaaS/", StorageServiceCenter.Public.Beijing.GetRequestUrl(@"/automao-images/SaaS/", out resourcePath));
+			Assert.Equal(@"http://automao-images.oss-cn-beijing.aliyuncs.com/SaaS/", StorageServiceCenter.External.Beijing.GetRequestUrl(@"/automao-images/SaaS/", out resourcePath));
 			Assert.Equal(@"SaaS/", resourcePath);
 
-			Assert.Equal(@"http://automao-images.oss-cn-beijing.aliyuncs.com/SaaS", StorageServiceCenter.Public.Beijing.GetRequestUrl(@"/automao-images/SaaS", out resourcePath));
+			Assert.Equal(@"http://automao-images.oss-cn-beijing.aliyuncs.com/SaaS", StorageServiceCenter.External.Beijing.GetRequestUrl(@"/automao-images/SaaS", out resourcePath));
 			Assert.Equal(@"SaaS", resourcePath);
 		}
 	}

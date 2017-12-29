@@ -30,60 +30,48 @@ using System.Collections.Generic;
 using Zongsoft.Options;
 using Zongsoft.Options.Configuration;
 
-namespace Zongsoft.Externals.Aliyun.Options.Configuration
+namespace Zongsoft.Externals.Aliyun.Sms.Options.Configuration
 {
 	public class GeneralConfiguration : OptionConfigurationElement, IConfiguration
 	{
 		#region 常量定义
-		private const string XML_NAME_ATTRIBUTE = "name";
-		private const string XML_INTERNAL_ATTRIBUTE = "internal";
-
-		private const string XML_SETTINGS_COLLECTION = "settings";
-		private const string XML_CERTIFICATES_COLLECTION = "certificates";
+		private const string XML_REGION_ATTRIBUTE = "region";
+		private const string XML_CERTIFICATE_ATTRIBUTE = "certificate";
 		#endregion
 
 		#region 公共属性
-		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, Behavior = OptionConfigurationPropertyBehavior.IsRequired)]
-		public ServiceCenterName Name
+		[OptionConfigurationProperty(XML_REGION_ATTRIBUTE, null)]
+		public ServiceCenterName? Region
 		{
 			get
 			{
-				return (ServiceCenterName)this[XML_NAME_ATTRIBUTE];
+				return (ServiceCenterName?)this[XML_REGION_ATTRIBUTE];
 			}
 			set
 			{
-				this[XML_NAME_ATTRIBUTE] = value;
+				this[XML_REGION_ATTRIBUTE] = value;
 			}
 		}
 
-		[OptionConfigurationProperty(XML_INTERNAL_ATTRIBUTE, DefaultValue = false)]
-		public bool IsInternal
+		[OptionConfigurationProperty(XML_CERTIFICATE_ATTRIBUTE)]
+		public string Certificate
 		{
 			get
 			{
-				return (bool)this[XML_INTERNAL_ATTRIBUTE];
+				return (string)this[XML_CERTIFICATE_ATTRIBUTE];
 			}
 			set
 			{
-				this[XML_INTERNAL_ATTRIBUTE] = value;
+				this[XML_CERTIFICATE_ATTRIBUTE] = value;
 			}
 		}
 
-		[OptionConfigurationProperty(XML_CERTIFICATES_COLLECTION, Type = typeof(CertificateElementCollection))]
-		public ICertificateProvider Certificates
+		[OptionConfigurationProperty("", Type = typeof(TemplateElementCollection))]
+		public Collections.INamedCollection<ITemplateOption> Templates
 		{
 			get
 			{
-				return (ICertificateProvider)this[XML_CERTIFICATES_COLLECTION];
-			}
-		}
-
-		[OptionConfigurationProperty(XML_SETTINGS_COLLECTION, Type = typeof(SettingElementCollection))]
-		public ISettingsProvider Settings
-		{
-			get
-			{
-				return (ISettingsProvider)this[XML_SETTINGS_COLLECTION];
+				return (Collections.INamedCollection<ITemplateOption>)this[string.Empty];
 			}
 		}
 		#endregion

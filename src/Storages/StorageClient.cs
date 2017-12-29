@@ -28,44 +28,34 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace Zongsoft.Externals.Aliyun.Storages
 {
-	public class StorageClient : MarshalByRefObject
+	public class StorageClient
 	{
 		#region 成员字段
-		private ICertification _certification;
+		private HttpClient _http;
+		private ICertificate _certificate;
 		private StorageServiceCenter _serviceCenter;
 		#endregion
 
 		#region 构造函数
-		internal StorageClient(StorageServiceCenter serviceCenter)
+		internal StorageClient(StorageServiceCenter serviceCenter, ICertificate certificate)
 		{
-			if(serviceCenter == null)
-				throw new ArgumentNullException("serviceCenter");
-
-			_serviceCenter = serviceCenter;
+			_serviceCenter = serviceCenter ?? throw new ArgumentNullException(nameof(serviceCenter));
+			_certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
+			_http = new HttpClient(new HttpClientHandler(certificate, StorageAuthenticator.Instance));
 		}
 		#endregion
 
 		#region 公共属性
-		public ICertification Certification
+		public ICertificate Certificate
 		{
 			get
 			{
-				return _certification;
-			}
-			set
-			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_certification = value;
+				return _certificate;
 			}
 		}
 
@@ -74,6 +64,16 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			get
 			{
 				return _serviceCenter;
+			}
+		}
+		#endregion
+
+		#region 内部属性
+		internal HttpClient HttpClient
+		{
+			get
+			{
+				return _http;
 			}
 		}
 		#endregion
@@ -101,25 +101,22 @@ namespace Zongsoft.Externals.Aliyun.Storages
 
 		public async Task<bool> CopyAsync(string source, string destination)
 		{
-			var client = this.CreateHttpClient();
 			var request = new HttpRequestMessage(HttpMethod.Put, _serviceCenter.GetRequestUrl(destination));
 
 			request.Headers.Add(StorageHeaders.OSS_COPY_SOURCE, source);
 
-			var result = await client.SendAsync(request);
+			var result = await _http.SendAsync(request);
 			return result.IsSuccessStatusCode;
 		}
 
 		public async Task<bool> DeleteAsync(string path)
 		{
-			var client = this.CreateHttpClient();
-			return (await client.DeleteAsync(_serviceCenter.GetRequestUrl(path))).IsSuccessStatusCode;
+			return (await _http.DeleteAsync(_serviceCenter.GetRequestUrl(path))).IsSuccessStatusCode;
 		}
 
 		public async Task<Stream> DownloadAsync(string path, IDictionary<string, object> properties = null)
 		{
-			var client = this.CreateHttpClient();
-			var response = await client.GetAsync(_serviceCenter.GetRequestUrl(path));
+			var response = await _http.GetAsync(_serviceCenter.GetRequestUrl(path));
 
 			//确认返回是否是成功
 			response.EnsureSuccessStatusCode();
@@ -137,30 +134,26 @@ namespace Zongsoft.Externals.Aliyun.Storages
 
 		public async Task<bool> CreateAsync(string path, Stream stream, IDictionary<string, object> extendedProperties = null)
 		{
-			var client = this.CreateHttpClient();
 			var request = this.CreateHttpRequest(HttpMethod.Put, path, this.EnsureCreatedTime(extendedProperties));
 
 			if(stream != null)
 				request.Content = new StreamContent(stream);
 
-			return (await client.SendAsync(request)).IsSuccessStatusCode;
+			return (await _http.SendAsync(request)).IsSuccessStatusCode;
 		}
 
 		public async Task<bool> ExistsAsync(string path)
 		{
-			var client = this.CreateHttpClient();
 			var request = new HttpRequestMessage(HttpMethod.Head, _serviceCenter.GetRequestUrl(path));
 
-			var result = await client.SendAsync(request);
+			var result = await _http.SendAsync(request);
 			return result.IsSuccessStatusCode;
 		}
 
 		public async Task<IDictionary<string, object>> GetExtendedPropertiesAsync(string path)
 		{
-			var client = this.CreateHttpClient();
 			var request = new HttpRequestMessage(HttpMethod.Head, _serviceCenter.GetRequestUrl(path));
-
-			var response = await client.SendAsync(request);
+			var response = await _http.SendAsync(request);
 
 			//确认返回是否是成功
 			response.EnsureSuccessStatusCode();
@@ -184,12 +177,10 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				properties[property.Key] = property.Value;
 			}
 
-			var client = this.CreateHttpClient();
 			var request = this.CreateHttpRequest(HttpMethod.Put, path, properties);
-
 			request.Headers.Add(StorageHeaders.OSS_COPY_SOURCE, path);
 
-			return (await client.SendAsync(request)).IsSuccessStatusCode;
+			return (await _http.SendAsync(request)).IsSuccessStatusCode;
 		}
 
 		public async Task<StorageSearchResult> SearchAsync(string path, Func<string, string> getUrl)
@@ -209,25 +200,17 @@ namespace Zongsoft.Externals.Aliyun.Storages
 
 			string baseName, resourcePath;
 			var url = _serviceCenter.GetBaseUrl(path, out baseName, out resourcePath) + "?prefix=" + Uri.EscapeDataString(resourcePath) + "&delimiter=%2F&max-keys=21";
-
-			var client = this.CreateHttpClient();
-
-			var response = await client.GetAsync(url);
+			var response = await _http.GetAsync(url);
 
 			//确保返回的内容是成功
 			response.EnsureSuccessStatusCode();
 
-			var resolver = new StorageSearchResultResolver(_serviceCenter, client, getUrl);
+			var resolver = new StorageSearchResultResolver(_serviceCenter, _http, getUrl);
 			return await resolver.Resolve(response);
 		}
 		#endregion
 
 		#region 内部方法
-		internal HttpClient CreateHttpClient()
-		{
-			return new HttpClient(new HttpClientHandler(_certification, StorageAuthenticator.Instance));
-		}
-
 		internal HttpRequestMessage CreateHttpRequest(HttpMethod method, string path, IDictionary<string, object> extendedProperties = null)
 		{
 			var request = new HttpRequestMessage(method, _serviceCenter.GetRequestUrl(path));

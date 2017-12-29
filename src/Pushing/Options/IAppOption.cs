@@ -25,21 +25,58 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Pushing.Options
 {
 	/// <summary>
-	/// 关于移动推送的设备类型的枚举。
+	/// 表示移动应用的配置项接口。
 	/// </summary>
-	public enum NotificationDeviceType
+	public interface IAppOption
 	{
-		/// <summary>所有设备</summary>
-		All,
+		/// <summary>
+		/// 获取或设置移动应用的名称。
+		/// </summary>
+		string Name
+		{
+			get;
+			set;
+		}
 
-		/// <summary>安卓设备</summary>
-		Android,
+		/// <summary>
+		/// 获取或设置移动应用的代号(即移动推送的App-Key)。
+		/// </summary>
+		string Code
+		{
+			get;
+			set;
+		}
 
-		/// <summary>苹果设备</summary>
-		iOS,
+		/// <summary>
+		/// 获取或设置移动应用的推送密码。
+		/// </summary>
+		string Secret
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置移动应用所属的运营商区域。
+		/// </summary>
+		ServiceCenterName? Region
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置移动应用关联的凭证名。
+		/// </summary>
+		string Certificate
+		{
+			get;
+			set;
+		}
 	}
 }

@@ -26,37 +26,46 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Sms
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示短信发送后的结果类。
 	/// </summary>
-	public interface IConfiguration
+	public class SmsSendResult
 	{
-		/// <summary>
-		/// 获取或设置配置的服务中心。
-		/// </summary>
-		ServiceCenterName Name
+		#region 成员字段
+		private string _code;
+		private string _message;
+		#endregion
+
+		#region 构造函数
+		public SmsSendResult()
 		{
-			get;
-			set;
 		}
 
-		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
-		/// </summary>
-		bool IsInternal
+		public SmsSendResult(string code, string message)
 		{
-			get;
-			set;
+			_code = code;
+			_message = message;
+		}
+		#endregion
+
+		#region 公共属性
+		public string Code
+		{
+			get
+			{
+				return _code;
+			}
 		}
 
-		/// <summary>
-		/// 获取阿里云的凭证提供程序。
-		/// </summary>
-		ICertificateProvider Certificates
+		public string Message
 		{
-			get;
+			get
+			{
+				return _message;
+			}
 		}
+		#endregion
 	}
 }

@@ -25,36 +25,37 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Pushing.Options
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示移动推送相关的配置接口。
 	/// </summary>
 	public interface IConfiguration
 	{
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取或设置移动推送运营商区域。
 		/// </summary>
-		ServiceCenterName Name
+		ServiceCenterName? Region
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取或设置关联的凭证名。
 		/// </summary>
-		bool IsInternal
+		string Certificate
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取阿里云的凭证提供程序。
+		/// 获取移动推送的应用配置项集合。
 		/// </summary>
-		ICertificateProvider Certificates
+		Collections.INamedCollection<IAppOption> Apps
 		{
 			get;
 		}

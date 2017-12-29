@@ -26,17 +26,38 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Messaging.Options
 {
 	/// <summary>
-	/// 关于移动消息推送类型的枚举。
+	/// 表示消息主题的配置项接口。
 	/// </summary>
-	public enum NotificationType
+	public interface ITopicOption
 	{
-		/// <summary>消息</summary>
-		Message,
+		/// <summary>
+		/// 获取或设置消息主题名。
+		/// </summary>
+		string Name
+		{
+			get;
+			set;
+		}
 
-		/// <summary>通知</summary>
-		Notice,
+		/// <summary>
+		/// 获取或设置消息主题所在的服务区域名，如果为空(null)或空字符串("")则由提供程序配置项指定。
+		/// </summary>
+		ServiceCenterName? Region
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 获取或设置消息主题关联的凭证名，如果为空(null)或空字符串("")则由提供程序配置项指定。
+		/// </summary>
+		string Certificate
+		{
+			get;
+			set;
+		}
 	}
 }

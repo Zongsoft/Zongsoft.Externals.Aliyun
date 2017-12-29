@@ -25,38 +25,32 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+using Zongsoft.Options;
+using Zongsoft.Options.Configuration;
+
+namespace Zongsoft.Externals.Aliyun.Storages.Options.Configuration
 {
-	/// <summary>
-	/// 表示阿里云的常规配置接口。
-	/// </summary>
-	public interface IConfiguration
+	public class BucketElementCollection : OptionConfigurationElementCollection<BucketElement, IBucketOption>
 	{
-		/// <summary>
-		/// 获取或设置配置的服务中心。
-		/// </summary>
-		ServiceCenterName Name
+		#region 常量定义
+		private const string XML_BUCKET_ELEMENT = "bucket";
+		#endregion
+
+		#region 重写方法
+		protected override string ElementName
 		{
-			get;
-			set;
+			get
+			{
+				return XML_BUCKET_ELEMENT;
+			}
 		}
 
-		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
-		/// </summary>
-		bool IsInternal
+		protected override string GetElementKey(OptionConfigurationElement element)
 		{
-			get;
-			set;
+			return ((BucketElement)element).Name;
 		}
-
-		/// <summary>
-		/// 获取阿里云的凭证提供程序。
-		/// </summary>
-		ICertificateProvider Certificates
-		{
-			get;
-		}
+		#endregion
 	}
 }

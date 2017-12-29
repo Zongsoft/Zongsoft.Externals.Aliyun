@@ -30,33 +30,33 @@ using System.Collections.Generic;
 using Zongsoft.Services;
 using Zongsoft.Resources;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Pushing
 {
 	[CommandOption("Name", typeof(string), null, "Text.NotificationSendCommand.Options.Name")]
 	[CommandOption("Title", typeof(string), null, "Text.NotificationSendCommand.Options.Title")]
 	[CommandOption("Expiry", typeof(int), -1, "Text.NotificationSendCommand.Options.Expiry")]
-	[CommandOption("Type", typeof(NotificationType), NotificationType.Message, "Text.NotificationSendCommand.Options.Type")]
-	[CommandOption("DeviceType", typeof(NotificationDeviceType), NotificationDeviceType.Android, "Text.NotificationSendCommand.Options.DeviceType")]
-	[CommandOption("TargetType", typeof(NotificationTargetType), NotificationTargetType.Alias, "Text.NotificationSendCommand.Options.TargetType")]
+	[CommandOption("Type", typeof(PushingType), PushingType.Message, "Text.NotificationSendCommand.Options.Type")]
+	[CommandOption("DeviceType", typeof(PushingDeviceType), PushingDeviceType.Android, "Text.NotificationSendCommand.Options.DeviceType")]
+	[CommandOption("TargetType", typeof(PushingTargetType), PushingTargetType.Alias, "Text.NotificationSendCommand.Options.TargetType")]
 	[CommandOption("Target", typeof(string), null, true, "Text.NotificationSendCommand.Options.Target")]
-	public class NotificationSendCommand : CommandBase<CommandContext>
+	public class PushingSendCommand : CommandBase<CommandContext>
 	{
 		#region 成员字段
-		private NotificationSender _sender;
+		private PushingSender _sender;
 		#endregion
 
 		#region 构造函数
-		public NotificationSendCommand() : base("Send")
+		public PushingSendCommand() : base("Send")
 		{
 		}
 
-		public NotificationSendCommand(string name) : base(name)
+		public PushingSendCommand(string name) : base(name)
 		{
 		}
 		#endregion
 
 		#region 公共属性
-		public NotificationSender Sender
+		public PushingSender Sender
 		{
 			get
 			{
@@ -83,9 +83,9 @@ namespace Zongsoft.Externals.Aliyun.Notification
 			if(string.IsNullOrWhiteSpace(destination))
 				throw new CommandOptionMissingException("target");
 
-			var settings = new NotificationSenderSettings(context.Expression.Options.GetValue<NotificationType>("type"),
-														  context.Expression.Options.GetValue<NotificationDeviceType>("deviceType"),
-														  context.Expression.Options.GetValue<NotificationTargetType>("targetType"),
+			var settings = new PushingSenderSettings(context.Expression.Options.GetValue<PushingType>("type"),
+														  context.Expression.Options.GetValue<PushingDeviceType>("deviceType"),
+														  context.Expression.Options.GetValue<PushingTargetType>("targetType"),
 														  context.Expression.Options.GetValue<int>("expiry"));
 
 			var results = new List<ICommandResult>();
@@ -128,9 +128,9 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		#endregion
 
 		#region 私有方法
-		private NotificationResult Send(string name, string title, string content, string destination, NotificationSenderSettings settings, Action<NotificationResult> onFaild)
+		private PushingResult Send(string name, string title, string content, string destination, PushingSenderSettings settings, Action<PushingResult> onFaild)
 		{
-			var result = Utility.ExecuteTask(() => _sender.Send(name, title, content, destination, settings));
+			var result = Utility.ExecuteTask(() => _sender.SendAsync(name, title, content, destination, settings));
 
 			if(result != null)
 			{

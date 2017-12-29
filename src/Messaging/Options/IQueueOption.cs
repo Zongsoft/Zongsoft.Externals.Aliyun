@@ -26,37 +26,38 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Messaging.Options
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示消息队列的配置项接口。
 	/// </summary>
-	public interface IConfiguration
+	public interface IQueueOption
 	{
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取或设置消息队列名。
 		/// </summary>
-		ServiceCenterName Name
+		string Name
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取或设置消息队列所在的服务区域名，如果为空(null)或空字符串("")则由提供程序配置项指定。
 		/// </summary>
-		bool IsInternal
+		ServiceCenterName? Region
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取阿里云的凭证提供程序。
+		/// 获取或设置消息队列关联的凭证名，如果为空(null)或空字符串("")则由提供程序配置项指定。
 		/// </summary>
-		ICertificateProvider Certificates
+		string Certificate
 		{
 			get;
+			set;
 		}
 	}
 }

@@ -25,20 +25,18 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Pushing
 {
-	public class NotificationAuthenticator : HttpAuthenticator
+	public class PushingAuthenticator : HttpAuthenticator
 	{
 		#region 单例字段
-		public static NotificationAuthenticator Instance = new NotificationAuthenticator();
+		public static PushingAuthenticator Instance = new PushingAuthenticator();
 		#endregion
 
 		#region 私有构造
-		private NotificationAuthenticator() : base("Signature", HttpSignatureMode.Parameter)
+		private PushingAuthenticator() : base("Signature", HttpSignatureMode.Parameter)
 		{
 		}
 		#endregion
@@ -63,51 +61,7 @@ namespace Zongsoft.Externals.Aliyun.Notification
 
 		protected override string CanonicalizeResource(HttpRequestMessage request)
 		{
-			var parts = request.RequestUri.Query.TrimStart('?').Split('&');
-			var dictionary = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-			string key, value;
-
-			foreach(var part in parts)
-			{
-				var index = part.IndexOf('=');
-
-				if(index > 0)
-				{
-					key = Uri.UnescapeDataString(part.Substring(0, index));
-					value = index < part.Length - 1 ? Uri.UnescapeDataString(part.Substring(index + 1)) : null;
-				}
-				else
-				{
-					key = Uri.UnescapeDataString(part);
-					value = null;
-				}
-
-				dictionary[key] = value;
-			}
-
-			var text = new StringBuilder((int)Math.Ceiling(request.RequestUri.Query.Length * 1.5));
-
-			foreach(var entry in dictionary)
-			{
-				if(text.Length > 0)
-					text.Append("&");
-
-				text.Append(this.CanonicalizeString(entry.Key) + "=" + this.CanonicalizeString(entry.Value));
-			}
-
-			return text.Replace("%2A", "*").Replace("%7E", "~").ToString();
-		}
-
-		protected override bool IsCanonicalizedHeader(string name)
-		{
-			return false;
-		}
-		#endregion
-
-		#region 私有方法
-		private string CanonicalizeString(string value)
-		{
-			return Uri.EscapeDataString(value);
+			return this.CanonicalizeQuery(request.RequestUri, tx => tx.Replace("%2A", "*").Replace("%7E", "~"));
 		}
 		#endregion
 	}

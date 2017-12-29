@@ -26,35 +26,25 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示阿里云访问凭证的配置项类。
 	/// </summary>
-	public interface IConfiguration
+	public interface ICertificate
 	{
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取凭证的标识（即：AccessKey）。
 		/// </summary>
-		ServiceCenterName Name
+		string Name
 		{
 			get;
-			set;
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取凭证的密钥（即：AccessKeySecret）。
 		/// </summary>
-		bool IsInternal
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取阿里云的凭证提供程序。
-		/// </summary>
-		ICertificateProvider Certificates
+		string Secret
 		{
 			get;
 		}

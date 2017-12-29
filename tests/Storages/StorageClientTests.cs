@@ -15,11 +15,11 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 	public class StorageClientTests
 	{
 		#region 常量定义
-		private const string BUCKET_PATH = @"/automao-images";
-		private const string EXISTS_DIRECTORY_PATH = BUCKET_PATH + "/SaaS/";
-		private const string EXISTS_FILE_PATH = BUCKET_PATH + "/automao-logo.png";
-		private const string NOTEXISTS_DIRECTORY_PATH = BUCKET_PATH + "/NotExists-Directory/";
-		private const string NOTEXISTS_FILE_PATH = BUCKET_PATH + "/NotExists-File";
+		private const string BUCKET_NAME = "Bucket-Name";
+		private const string EXISTS_DIRECTORY_PATH = "/" + BUCKET_NAME + "/SaaS/";
+		private const string EXISTS_FILE_PATH = "/" + BUCKET_NAME + "/automao-logo.png";
+		private const string NOTEXISTS_DIRECTORY_PATH = "/" + BUCKET_NAME + "/NotExists-Directory/";
+		private const string NOTEXISTS_FILE_PATH = "/" + BUCKET_NAME + "/NotExists-File";
 		#endregion
 
 		#region 私有字段
@@ -30,10 +30,9 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		public StorageClientTests()
 		{
 			var configuration = Zongsoft.Options.Configuration.OptionConfiguration.Load(@"\Zongsoft\Zongsoft.Externals.Aliyun\src\Zongsoft.Externals.Aliyun.option");
-			var option = configuration.GetOptionValue("Externals/Aliyun/General") as Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration;
+			var option = configuration.GetOptionValue("Externals/Aliyun/OSS") as Aliyun.Storages.Options.IConfiguration;
 
-			_client = StorageServiceCenter.GetInstance(option.Name, option.IsInternal).Client;
-			_client.Certification = option.Certification;
+			//_client = StorageServiceCenter.GetInstance(option.Name, option.IsInternal).Client;
 		}
 		#endregion
 
@@ -41,7 +40,7 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		[Xunit.Fact]
 		public void CopyTest()
 		{
-			_client.CopyAsync(@"/automao-images/SaaS/toyota-logo.jpg", @"/automao-data/SaaS/Toyota-Logo.jpg").Wait();
+			_client.CopyAsync($"/{BUCKET_NAME}/SaaS/toyota-logo.jpg", $"/{BUCKET_NAME}/SaaS/Toyota-Logo.jpg").Wait();
 		}
 
 		[Xunit.Fact]
@@ -57,7 +56,7 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		[Xunit.Fact]
 		public void DownloadTest()
 		{
-			var stream = _client.DownloadAsync(@"/automao-images/automao-logo.png?ac=yes&response-content-encoding=utf8&acl=yes&bb=no").Result;
+			var stream = _client.DownloadAsync($"/{BUCKET_NAME}/automao-logo.png?ac=yes&response-content-encoding=utf8&acl=yes&bb=no").Result;
 
 			Assert.NotNull(stream);
 		}

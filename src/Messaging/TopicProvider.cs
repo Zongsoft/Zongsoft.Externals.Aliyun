@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Text;
 
@@ -37,15 +38,16 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 	public class TopicProvider : Zongsoft.Messaging.ITopicProvider
 	{
 		#region 成员字段
-		private HttpClient _http;
 		private Options.IConfiguration _configuration;
-		private readonly IDictionary<string, ITopic> _topics;
+		private readonly ConcurrentDictionary<string, ITopic> _topics;
+		private readonly ConcurrentDictionary<string, HttpClient> _pool;
 		#endregion
 
 		#region 构造函数
 		public TopicProvider()
 		{
-			_topics = new Dictionary<string, ITopic>();
+			_topics = new ConcurrentDictionary<string, ITopic>();
+			_pool = new ConcurrentDictionary<string, HttpClient>();
 		}
 		#endregion
 
@@ -68,14 +70,6 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			}
 		}
 
-		public MessageQueueServiceCenter ServiceCenter
-		{
-			get
-			{
-				return MessageQueueServiceCenter.GetInstance(_configuration.Name, _configuration.IsInternal);
-			}
-		}
-
 		public ITopic this[string name]
 		{
 			get
@@ -84,31 +78,6 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 					throw new ArgumentNullException("name");
 
 				return this.Get(name);
-			}
-		}
-		#endregion
-
-		#region 保护属性
-		public HttpClient Http
-		{
-			get
-			{
-				if(_http == null)
-				{
-					if(_configuration == null)
-						throw new InvalidOperationException("Missing required configuration.");
-
-					lock(_configuration)
-					{
-						if(_http == null)
-						{
-							_http = new HttpClient(new HttpClientHandler(_configuration.Certification, MessageQueueAuthenticator.Instance));
-							_http.DefaultRequestHeaders.Add("x-mns-version", "2015-06-06");
-						}
-					}
-				}
-
-				return _http;
 			}
 		}
 		#endregion
@@ -124,7 +93,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(_topics.TryGetValue(name, out topic))
 				return topic;
 
-			var http = this.Http;
+			var http = this.GetHttpClient(name);
 			var response = http.GetAsync(this.GetRequestUrl(name));
 
 			if(response.Result.IsSuccessStatusCode)
@@ -132,7 +101,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				var info = MessageUtility.ResolveTopicInfo(response.Result.Content.ReadAsStreamAsync().Result);
 
 				if(info != null)
-					return new Topic(this, name, info);
+					return new Topic(this, name, info, http);
 			}
 
 			return null;
@@ -143,9 +112,9 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			var http = this.Http;
+			var http = this.GetHttpClient(name);
 
-			var response = http.PutAsync(this.GetRequestUrl(name), new StringContent("", Encoding.UTF8, "application/xml"));
+			var response = http.PutAsync(this.GetRequestUrl(name), new StringContent(@"<Topic xmlns=""http://mns.aliyuncs.com/doc/v1/""><MaximumMessageSize>10240</MaximumMessageSize><LoggingEnabled>True</LoggingEnabled></Topic>", Encoding.UTF8, "application/xml"));
 
 			if(response.Result.IsSuccessStatusCode)
 			{
@@ -161,7 +130,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(string.IsNullOrEmpty(name))
 				return false;
 
-			var http = this.Http;
+			var http = this.GetHttpClient(name);
 			var response = http.DeleteAsync(this.GetRequestUrl(name));
 
 			return response.Result != null && response.Result.IsSuccessStatusCode;
@@ -169,19 +138,53 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#endregion
 
 		#region 内部方法
-		internal string GetRequestUrl(params string[] parts)
+		internal HttpClient GetHttpClient(string name)
 		{
-			var configuration = this.Configuration;
+			var certificate = this.GetCertificate(name);
 
-			if(configuration == null)
-				throw new InvalidOperationException("Missing required configuration.");
+			return _pool.GetOrAdd(certificate.Name, key =>
+			{
+				var http = new HttpClient(new HttpClientHandler(certificate, MessageQueueAuthenticator.Instance));
+				http.DefaultRequestHeaders.Add("x-mns-version", "2015-06-06");
+				return http;
+			});
+		}
+
+		internal ICertificate GetCertificate(string name)
+		{
+			var configuration = this.EnsureConfiguration();
+			var certificate = configuration.Topics.Get(name, false)?.Certificate;
+
+			if(string.IsNullOrWhiteSpace(certificate))
+				certificate = configuration.Topics.Certificate;
+
+			if(string.IsNullOrWhiteSpace(certificate))
+				return Aliyun.Configuration.Instance.Certificates.Default;
+
+			return Aliyun.Configuration.Instance.Certificates.Get(certificate, true);
+		}
+
+		internal string GetRequestUrl(string topicName, params string[] parts)
+		{
+			var configuration = this.EnsureConfiguration();
+			var option = configuration.Topics.Get(topicName, false);
+			var region = option?.Region ?? configuration.Topics.Region ?? Aliyun.Configuration.Instance.Name;
+			var center = ServiceCenter.GetInstance(region, Aliyun.Configuration.Instance.IsInternal);
 
 			var path = parts == null ? string.Empty : string.Join("/", parts);
 
 			if(string.IsNullOrEmpty(path))
-				return string.Format("http://{0}.{1}/topics", configuration.Messaging.Name, this.ServiceCenter.Path);
+				return string.Format("http://{0}.{1}/topics/{2}", configuration.Name, center.Path, topicName);
 			else
-				return string.Format("http://{0}.{1}/topics/{2}", configuration.Messaging.Name, this.ServiceCenter.Path, path);
+				return string.Format("http://{0}.{1}/topics/{2}/{3}", configuration.Name, center.Path, topicName, path);
+		}
+		#endregion
+
+		#region 私有方法
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private Options.IConfiguration EnsureConfiguration()
+		{
+			return this.Configuration ?? throw new InvalidOperationException("Missing required configuration of the topic provider(aliyun).");
 		}
 		#endregion
 	}

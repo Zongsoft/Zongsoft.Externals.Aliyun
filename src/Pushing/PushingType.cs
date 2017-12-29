@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -26,24 +26,17 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun
+namespace Zongsoft.Externals.Aliyun.Pushing
 {
-	public interface ICertification
+	/// <summary>
+	/// 关于移动消息推送类型的枚举。
+	/// </summary>
+	public enum PushingType
 	{
-		/// <summary>
-		/// 获取凭证的标识(Access Key Id)。
-		/// </summary>
-		string Name
-		{
-			get;
-		}
+		/// <summary>消息</summary>
+		Message,
 
-		/// <summary>
-		/// 获取凭证的密钥(Access Key Secret)。
-		/// </summary>
-		string Secret
-		{
-			get;
-		}
+		/// <summary>通知</summary>
+		Notice,
 	}
 }

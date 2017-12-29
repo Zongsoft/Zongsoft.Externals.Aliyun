@@ -2,7 +2,7 @@
  * Authors:
  *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
  *
- * Copyright (C) 2015 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -26,12 +26,12 @@
 
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 using Zongsoft.IO;
-using Zongsoft.Services;
 
 namespace Zongsoft.Externals.Aliyun.Storages
 {
@@ -42,19 +42,24 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		private Options.IConfiguration _configuration;
 		private StorageFileProvider _file;
 		private StorageDirectoryProvider _directory;
+		private ConcurrentDictionary<string, StorageClient> _pool;
 		#endregion
 
 		#region 构造函数
 		public StorageFileSystem()
 		{
+			_file = new StorageFileProvider(this);
+			_directory = new StorageDirectoryProvider(this);
+			_pool = new ConcurrentDictionary<string, StorageClient>();
 		}
 
 		public StorageFileSystem(Options.IConfiguration configuration)
 		{
-			if(configuration == null)
-				throw new ArgumentNullException(nameof(configuration));
+			_configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-			_configuration = configuration;
+			_file = new StorageFileProvider(this);
+			_directory = new StorageDirectoryProvider(this);
+			_pool = new ConcurrentDictionary<string, StorageClient>();
 		}
 		#endregion
 
@@ -74,9 +79,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 			get
 			{
-				if(_file == null)
-					System.Threading.Interlocked.CompareExchange(ref _file, new StorageFileProvider(this), null);
-
 				return _file;
 			}
 		}
@@ -85,9 +87,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 			get
 			{
-				if(_directory == null)
-					System.Threading.Interlocked.CompareExchange(ref _directory, new StorageDirectoryProvider(this), null);
-
 				return _directory;
 			}
 		}
@@ -100,25 +99,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			}
 			set
 			{
-				if(value == null)
-					throw new ArgumentNullException();
-
-				_configuration = value;
-			}
-		}
-
-		public Storages.StorageClient Client
-		{
-			get
-			{
-				var option = _configuration;
-
-				if(option == null)
-					return null;
-
-				var client = Storages.StorageServiceCenter.GetInstance(option.Name, option.IsInternal).Client;
-				client.Certification = option.Certification;
-				return client;
+				_configuration = value ?? throw new ArgumentNullException();
 			}
 		}
 		#endregion
@@ -126,15 +107,82 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		#region 公共方法
 		public string GetUrl(string path)
 		{
-			if(string.IsNullOrWhiteSpace(path))
-				throw new ArgumentNullException("path");
+			if(string.IsNullOrEmpty(path))
+				return null;
 
-			var option = _configuration;
+			return this.GetUrl(Zongsoft.IO.Path.Parse(path));
+		}
 
-			if(option == null)
-				throw new InvalidOperationException("The value of 'Option' property is null.");
+		public string GetUrl(Zongsoft.IO.Path path)
+		{
+			if(path == null || path.Segments.Length == 0)
+				return null;
 
-			return StorageServiceCenter.GetInstance(option.Name, false).GetRequestUrl(path);
+			//确认OSS对象存储配置
+			var configuration = this.EnsureConfiguration();
+
+			//获取当前路径对应的存储器配置项，注：BucketName即为路径中的第一节
+			var bucket = configuration.Buckets.Get(path.Segments[0], false);
+
+			//获取当前路径对应的服务区域
+			var region = this.GetRegion(bucket);
+
+			return StorageServiceCenter.GetInstance(region, false).GetRequestUrl(path.FullPath);
+		}
+		#endregion
+
+		#region 内部方法
+		internal StorageClient GetClient(string bucketName)
+		{
+			if(string.IsNullOrEmpty(bucketName))
+				throw new ArgumentNullException(nameof(bucketName));
+
+			return _pool.GetOrAdd(bucketName, key =>
+			{
+				return this.CreateClient(bucketName);
+			});
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+		private StorageClient CreateClient(string bucketName)
+		{
+			//确认OSS对象存储配置
+			var configuration = this.EnsureConfiguration();
+
+			//获取指定名称的存储器配置项
+			var bucket = configuration.Buckets.Get(bucketName, false);
+
+			var region = this.GetRegion(bucket);
+			var center = StorageServiceCenter.GetInstance(region, Aliyun.Configuration.Instance.IsInternal);
+			var certificate = this.GetCertificate(bucket);
+
+			return new StorageClient(center, certificate);
+		}
+		#endregion
+
+		#region 私有方法
+		private ICertificate GetCertificate(Options.IBucketOption bucket)
+		{
+			var certificate = bucket?.Certificate;
+
+			if(string.IsNullOrWhiteSpace(certificate))
+				certificate = _configuration?.Certificate;
+
+			if(string.IsNullOrWhiteSpace(certificate))
+				return Aliyun.Configuration.Instance.Certificates.Default;
+
+			return Aliyun.Configuration.Instance.Certificates.Get(certificate, true);
+		}
+
+		private ServiceCenterName GetRegion(Options.IBucketOption bucket)
+		{
+			return bucket?.Region ?? _configuration?.Region ?? Aliyun.Configuration.Instance.Name;
+		}
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+		private Options.IConfiguration EnsureConfiguration()
+		{
+			return this.Configuration ?? throw new InvalidOperationException("Missing required configuration of the OSS file-system(aliyun).");
 		}
 		#endregion
 
@@ -143,29 +191,26 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 			#region 成员字段
 			private StorageFileSystem _fileSystem;
-			private Storages.StorageClient _client;
 			#endregion
 
 			#region 私有构造
 			internal StorageDirectoryProvider(StorageFileSystem fileSystem)
 			{
-				if(fileSystem == null)
-					throw new ArgumentNullException("fileSystem");
-
-				_fileSystem = fileSystem;
-				_client = fileSystem.Client;
+				_fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 			}
 			#endregion
 
 			#region 公共方法
 			public bool Create(string path, IDictionary<string, object> properties = null)
 			{
-				return Utility.ExecuteTask(() => _client.CreateAsync(this.EnsureDirectoryPath(path), properties));
+				return Utility.ExecuteTask(() => this.CreateAsync(path, properties));
 			}
 
-			public async Task<bool> CreateAsync(string path, IDictionary<string, object> properties = null)
+			public Task<bool> CreateAsync(string path, IDictionary<string, object> properties = null)
 			{
-				return await _client.CreateAsync(this.EnsureDirectoryPath(path), properties);
+				var directory = this.EnsureDirectoryPath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				return client.CreateAsync(directory, properties);
 			}
 
 			public bool Delete(string path, bool recursive = false)
@@ -173,69 +218,65 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				if(recursive)
 					throw new NotSupportedException();
 
-				return Utility.ExecuteTask(() => _client.DeleteAsync(this.EnsureDirectoryPath(path)));
+				return Utility.ExecuteTask(() => this.DeleteAsync(path, recursive));
 			}
 
-			public async Task<bool> DeleteAsync(string path, bool recursive = false)
+			public Task<bool> DeleteAsync(string path, bool recursive = false)
 			{
 				if(recursive)
 					throw new NotSupportedException();
 
-				return await _client.DeleteAsync(this.EnsureDirectoryPath(path));
+				var directory = this.EnsureDirectoryPath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				return client.DeleteAsync(directory);
 			}
 
 			public void Move(string source, string destination)
 			{
-				source = this.EnsureDirectoryPath(source);
-				destination = this.EnsureDirectoryPath(destination);
-
-				if(Utility.ExecuteTask(() => _client.CopyAsync(source, destination)))
-					Utility.ExecuteTask(() => _client.DeleteAsync(source));
+				throw new NotSupportedException();
 			}
 
-			public async Task MoveAsync(string source, string destination)
+			public Task MoveAsync(string source, string destination)
 			{
-				source = this.EnsureDirectoryPath(source);
-				destination = this.EnsureDirectoryPath(destination);
-
-				if(await _client.CopyAsync(source, destination))
-					await _client.DeleteAsync(source);
+				throw new NotSupportedException();
 			}
 
 			public bool Exists(string path)
 			{
-				return Utility.ExecuteTask(() => _client.ExistsAsync(this.EnsureDirectoryPath(path)));
+				return Utility.ExecuteTask(() => this.ExistsAsync(path));
 			}
 
-			public async Task<bool> ExistsAsync(string path)
+			public Task<bool> ExistsAsync(string path)
 			{
-				return await _client.ExistsAsync(this.EnsureDirectoryPath(path));
+				var directory = this.EnsureDirectoryPath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				return client.ExistsAsync(directory);
 			}
 
 			public Zongsoft.IO.DirectoryInfo GetInfo(string path)
 			{
-				path = this.EnsureDirectoryPath(path);
-				var properties = Utility.ExecuteTask(() => _client.GetExtendedPropertiesAsync(path));
-
-				return this.GenerateInfo(path, properties);
+				return Utility.ExecuteTask(() => this.GetInfoAsync(path));
 			}
 
 			public async Task<Zongsoft.IO.DirectoryInfo> GetInfoAsync(string path)
 			{
-				path = this.EnsureDirectoryPath(path);
-				var properties = await _client.GetExtendedPropertiesAsync(path);
+				var directory = this.EnsureDirectoryPath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				var properties = await client.GetExtendedPropertiesAsync(directory);
 
 				return this.GenerateInfo(path, properties);
 			}
 
 			public bool SetInfo(string path, IDictionary<string, object> properties)
 			{
-				return Utility.ExecuteTask(() => _client.SetExtendedPropertiesAsync(this.EnsureDirectoryPath(path), properties));
+				return Utility.ExecuteTask(() => this.SetInfoAsync(path, properties));
 			}
 
-			public async Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties)
+			public Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties)
 			{
-				return await _client.SetExtendedPropertiesAsync(this.EnsureDirectoryPath(path), properties);
+				var directory = this.EnsureDirectoryPath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				return client.SetExtendedPropertiesAsync(directory, properties);
 			}
 
 			public IEnumerable<Zongsoft.IO.PathInfo> GetChildren(string path)
@@ -248,14 +289,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				if(recursive)
 					throw new NotSupportedException();
 
-				path = this.EnsurePatternPath(path, pattern);
-
-				var list = Utility.ExecuteTask(() => _client.SearchAsync(path, p => _fileSystem.GetUrl(p)));
-
-				if(list == null)
-					return Enumerable.Empty<Zongsoft.IO.PathInfo>();
-
-				return list;
+				return Utility.ExecuteTask(() => this.GetChildrenAsync(path, pattern, recursive));
 			}
 
 			public Task<IEnumerable<Zongsoft.IO.PathInfo>> GetChildrenAsync(string path)
@@ -268,14 +302,15 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				if(recursive)
 					throw new NotSupportedException();
 
-				path = this.EnsurePatternPath(path, pattern);
+				var directory = this.EnsurePatternPath(path, pattern, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
 
-				var list = await _client.SearchAsync(path, p => _fileSystem.GetUrl(p));
+				var result = await client.SearchAsync(directory, p => _fileSystem.GetUrl(p));
 
-				if(list == null)
+				if(result == null)
 					return Enumerable.Empty<Zongsoft.IO.PathInfo>();
 
-				return list;
+				return result;
 			}
 
 			public IEnumerable<Zongsoft.IO.DirectoryInfo> GetDirectories(string path)
@@ -288,14 +323,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				if(recursive)
 					throw new NotSupportedException();
 
-				path = this.EnsurePatternPath(path, pattern);
-
-				var list = Utility.ExecuteTask(() => _client.SearchAsync(path, p => _fileSystem.GetUrl(p)));
-
-				if(list == null)
-					return Enumerable.Empty<Zongsoft.IO.DirectoryInfo>();
-
-				return list.Where(item => item.IsDirectory).Select(item => (Zongsoft.IO.DirectoryInfo)item);
+				return Utility.ExecuteTask(() => this.GetDirectoriesAsync(path, pattern, recursive));
 			}
 
 			public Task<IEnumerable<Zongsoft.IO.DirectoryInfo>> GetDirectoriesAsync(string path)
@@ -308,14 +336,15 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				if(recursive)
 					throw new NotSupportedException();
 
-				path = this.EnsurePatternPath(path, pattern);
+				var directory = this.EnsurePatternPath(path, pattern, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
 
-				var list = await _client.SearchAsync(path, p => _fileSystem.GetUrl(p));
+				var result = await client.SearchAsync(directory, p => _fileSystem.GetUrl(p));
 
-				if(list == null)
+				if(result == null)
 					return Enumerable.Empty<Zongsoft.IO.DirectoryInfo>();
 
-				return list.Where(item => item.IsDirectory).Select(item => (Zongsoft.IO.DirectoryInfo)item);
+				return result.Where(item => item.IsDirectory).Select(item => (Zongsoft.IO.DirectoryInfo)item);
 			}
 
 			public IEnumerable<Zongsoft.IO.FileInfo> GetFiles(string path)
@@ -328,14 +357,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				if(recursive)
 					throw new NotSupportedException();
 
-				path = this.EnsurePatternPath(path, pattern);
-
-				var list = Utility.ExecuteTask(() => _client.SearchAsync(path, p => _fileSystem.GetUrl(p)));
-
-				if(list == null)
-					return Enumerable.Empty<Zongsoft.IO.FileInfo>();
-
-				return list.Where(item => item.IsFile).Select(item => (Zongsoft.IO.FileInfo)item);
+				return Utility.ExecuteTask(() => this.GetFilesAsync(path, pattern, recursive));
 			}
 
 			public Task<IEnumerable<Zongsoft.IO.FileInfo>> GetFilesAsync(string path)
@@ -348,37 +370,39 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				if(recursive)
 					throw new NotSupportedException();
 
-				path = this.EnsurePatternPath(path, pattern);
+				var directory = this.EnsurePatternPath(path, pattern, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
 
-				var list = await _client.SearchAsync(path, p => _fileSystem.GetUrl(p));
+				var result = await client.SearchAsync(directory, p => _fileSystem.GetUrl(p));
 
-				if(list == null)
+				if(result == null)
 					return Enumerable.Empty<Zongsoft.IO.FileInfo>();
 
-				return list.Where(item => item.IsFile).Select(item => (Zongsoft.IO.FileInfo)item);
+				return result.Where(item => item.IsFile).Select(item => (Zongsoft.IO.FileInfo)item);
 			}
 			#endregion
 
 			#region 私有方法
-			private string EnsureDirectoryPath(string path)
+			private string EnsureDirectoryPath(string text, out string bucketName)
 			{
-				if(string.IsNullOrWhiteSpace(path))
-					throw new ArgumentNullException("path");
+				var path = Zongsoft.IO.Path.Parse(text);
 
-				path = path.Trim();
+				if(!path.IsDirectory)
+					throw new PathException("Invalid directory path.");
 
-				if(path.EndsWith("/"))
-					return path;
-				else
-					return path + "/";
+				if(path.Segments.Length == 0)
+					throw new PathException("Missing bucket name of the directory path.");
+
+				bucketName = path.Segments[0];
+				return path.FullPath;
 			}
 
-			private string EnsurePatternPath(string path, string pattern)
+			private string EnsurePatternPath(string path, string pattern, out string bucketName)
 			{
 				if(string.IsNullOrWhiteSpace(pattern))
-					return this.EnsureDirectoryPath(path);
+					return this.EnsureDirectoryPath(path, out bucketName);
 
-				return this.EnsureDirectoryPath(path) + pattern.Trim('*', ' ', '\t', '\r', '\n').TrimStart('/');
+				return this.EnsureDirectoryPath(path, out bucketName) + pattern.Trim('*', ' ', '\t', '\r', '\n').TrimStart('/');
 			}
 
 			private Zongsoft.IO.DirectoryInfo GenerateInfo(string path, IDictionary<string, object> properties)
@@ -419,121 +443,162 @@ namespace Zongsoft.Externals.Aliyun.Storages
 		{
 			#region 成员字段
 			private StorageFileSystem _fileSystem;
-			private Storages.StorageClient _client;
 			#endregion
 
 			#region 私有构造
 			internal StorageFileProvider(StorageFileSystem fileSystem)
 			{
-				if(fileSystem == null)
-					throw new ArgumentNullException("fileSystem");
-
-				_fileSystem = fileSystem;
-				_client = fileSystem.Client;
+				_fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 			}
 			#endregion
 
 			#region 公共方法
 			public bool Delete(string path)
 			{
-				return Utility.ExecuteTask(() => _client.DeleteAsync(this.EnsureFilePath(path)));
+				return Utility.ExecuteTask(() => this.DeleteAsync(path));
 			}
 
 			public Task<bool> DeleteAsync(string path)
 			{
-				return _client.DeleteAsync(this.EnsureFilePath(path));
+				path = this.EnsureFilePath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				return client.DeleteAsync(path);
 			}
 
 			public bool Exists(string path)
 			{
-				return Utility.ExecuteTask(() => _client.ExistsAsync(this.EnsureFilePath(path)));
+				return Utility.ExecuteTask(() => this.ExistsAsync(path));
 			}
 
 			public Task<bool> ExistsAsync(string path)
 			{
-				return _client.ExistsAsync(this.EnsureFilePath(path));
+				path = this.EnsureFilePath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				return client.ExistsAsync(path);
 			}
 
 			public void Copy(string source, string destination)
 			{
-				this.Copy(source, destination, true);
+				this.Copy(source, destination, false);
 			}
 
 			public void Copy(string source, string destination, bool overwrite)
 			{
-				source = this.EnsureFilePath(source);
-				destination = this.EnsureFilePath(destination);
-
-				if(!overwrite)
-				{
-					if(Utility.ExecuteTask(() => _client.ExistsAsync(destination)))
-						return;
-				}
-
-				Utility.ExecuteTask(() => _client.CopyAsync(source, destination));
+				this.CopyAsync(source, destination, overwrite).Wait();
 			}
 
 			public Task CopyAsync(string source, string destination)
 			{
-				return this.CopyAsync(source, destination, true);
+				return this.CopyAsync(source, destination, false);
 			}
 
 			public async Task CopyAsync(string source, string destination, bool overwrite)
 			{
-				source = this.EnsureFilePath(source);
-				destination = this.EnsureFilePath(destination);
+				source = this.EnsureFilePath(source, out var sourceBucket);
+				destination = this.EnsureFilePath(destination, out var destinationBucket);
 
-				if(!overwrite)
+				if(string.Equals(sourceBucket, destinationBucket, StringComparison.OrdinalIgnoreCase))
 				{
-					if(await _client.ExistsAsync(destination))
-						return;
-				}
+					var client = _fileSystem.GetClient(sourceBucket);
 
-				await _client.CopyAsync(source, destination);
+					if(!overwrite && await client.ExistsAsync(destination))
+						return;
+
+					await client.CopyAsync(source, destination);
+				}
+				else
+				{
+					var sourceClient = _fileSystem.GetClient(sourceBucket);
+					var destinationClient = _fileSystem.GetClient(destinationBucket);
+
+					if(!overwrite && await destinationClient.ExistsAsync(destination))
+						return;
+
+					using(var sourceStream = await sourceClient.DownloadAsync(source))
+					{
+						using(var uploader = destinationClient.GetUploader(destination))
+						{
+							var buffer = new byte[1024 * 64];
+							var bytesRead = 0;
+
+							while((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+							{
+								uploader.Write(buffer, 0, bytesRead);
+							}
+
+							uploader.Flush();
+						}
+					}
+				}
 			}
 
 			public void Move(string source, string destination)
 			{
-				source = this.EnsureFilePath(source);
-				destination = this.EnsureFilePath(destination);
-
-				if(Utility.ExecuteTask(() => _client.CopyAsync(source, destination)))
-					Utility.ExecuteTask(() => _client.DeleteAsync(source));
+				this.MoveAsync(source, destination).Wait();
 			}
 
 			public async Task MoveAsync(string source, string destination)
 			{
-				source = this.EnsureFilePath(source);
-				destination = this.EnsureFilePath(destination);
+				source = this.EnsureFilePath(source, out var sourceBucket);
+				destination = this.EnsureFilePath(destination, out var destinationBucket);
 
-				if(await _client.CopyAsync(source, destination))
-					await _client.DeleteAsync(source);
+				if(string.Equals(sourceBucket, destinationBucket, StringComparison.OrdinalIgnoreCase))
+				{
+					var client = _fileSystem.GetClient(sourceBucket);
+
+					if(await client.CopyAsync(source, destination))
+						await client.DeleteAsync(source);
+				}
+				else
+				{
+					var sourceClient = _fileSystem.GetClient(sourceBucket);
+					var destinationClient = _fileSystem.GetClient(destinationBucket);
+
+					using(var sourceStream = await sourceClient.DownloadAsync(source))
+					{
+						using(var uploader = destinationClient.GetUploader(destination))
+						{
+							var buffer = new byte[1024 * 64];
+							var bytesRead = 0;
+
+							while((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+							{
+								uploader.Write(buffer, 0, bytesRead);
+							}
+
+							uploader.Flush();
+						}
+					}
+
+					await sourceClient.DeleteAsync(source);
+				}
 			}
 
 			public Zongsoft.IO.FileInfo GetInfo(string path)
 			{
-				path = this.EnsureFilePath(path);
-				var properties = Utility.ExecuteTask(() => _client.GetExtendedPropertiesAsync(path));
-
-				return this.GenerateInfo(path, properties);
+				return Utility.ExecuteTask(() => this.GetInfoAsync(path));
 			}
 
 			public async Task<Zongsoft.IO.FileInfo> GetInfoAsync(string path)
 			{
-				path = this.EnsureFilePath(path);
-				var properties = await _client.GetExtendedPropertiesAsync(path);
+				path = this.EnsureFilePath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+
+				var properties = await client.GetExtendedPropertiesAsync(path);
 
 				return this.GenerateInfo(path, properties);
 			}
 
 			public bool SetInfo(string path, IDictionary<string, object> properties)
 			{
-				return Utility.ExecuteTask(() => _client.SetExtendedPropertiesAsync(this.EnsureFilePath(path), properties));
+				return Utility.ExecuteTask(() => this.SetInfoAsync(path, properties));
 			}
 
 			public async Task<bool> SetInfoAsync(string path, IDictionary<string, object> properties)
 			{
-				return await _client.SetExtendedPropertiesAsync(this.EnsureFilePath(path), properties);
+				path = this.EnsureFilePath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+				return await client.SetExtendedPropertiesAsync(path, properties);
 			}
 
 			public Stream Open(string path, IDictionary<string, object> properties = null)
@@ -553,22 +618,28 @@ namespace Zongsoft.Externals.Aliyun.Storages
 
 			public Stream Open(string path, FileMode mode, FileAccess access, FileShare share, IDictionary<string, object> properties = null)
 			{
+				path = this.EnsureFilePath(path, out var bucketName);
+				var client = _fileSystem.GetClient(bucketName);
+
 				bool writable = (mode != FileMode.Open) || (access & FileAccess.Write) == FileAccess.Write;
 
 				if(writable)
-					return new StorageFileStream(_client.GetUploader(path, properties));
+					return new StorageFileStream(client.GetUploader(path, properties));
 
-				return Utility.ExecuteTask(() => _client.DownloadAsync(this.EnsureFilePath(path), properties));
+				return Utility.ExecuteTask(() => client.DownloadAsync(path, properties));
 			}
 			#endregion
 
 			#region 私有方法
-			private string EnsureFilePath(string path)
+			private string EnsureFilePath(string text, out string bucketName)
 			{
-				if(string.IsNullOrWhiteSpace(path))
-					throw new ArgumentNullException("path");
+				var path = Zongsoft.IO.Path.Parse(text);
 
-				return path.Trim().TrimEnd('/', '\\');
+				if(!path.IsFile)
+					throw new PathException("Invalid file path.");
+
+				bucketName = path.Segments[0];
+				return path.FullPath;
 			}
 
 			private Zongsoft.IO.FileInfo GenerateInfo(string path, IDictionary<string, object> properties)
@@ -624,9 +695,6 @@ namespace Zongsoft.Externals.Aliyun.Storages
 				#region 构造函数
 				internal StorageFileStream(StorageUploader uploader)
 				{
-					if(uploader == null)
-						throw new ArgumentNullException("uploader");
-
 					_uploader = uploader;
 				}
 				#endregion

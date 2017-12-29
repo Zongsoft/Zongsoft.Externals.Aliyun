@@ -26,30 +26,30 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Pushing
 {
 	/// <summary>
 	/// 表示移动推送的设置选项类。
 	/// </summary>
-	public class NotificationSenderSettings
+	public class PushingSenderSettings
 	{
 		#region 成员字段
 		private int _expiry;
-		private NotificationType _type;
-		private NotificationDeviceType _deviceType;
-		private NotificationTargetType _targetType;
+		private PushingType _type;
+		private PushingDeviceType _deviceType;
+		private PushingTargetType _targetType;
 		#endregion
 
 		#region 构造函数
-		public NotificationSenderSettings()
+		public PushingSenderSettings()
 		{
 			_expiry = 60 * 72;
-			_type = NotificationType.Message;
-			_deviceType = NotificationDeviceType.All;
-			_targetType = NotificationTargetType.Alias;
+			_type = PushingType.Message;
+			_deviceType = PushingDeviceType.All;
+			_targetType = PushingTargetType.Alias;
 		}
 
-		public NotificationSenderSettings(NotificationType type, NotificationDeviceType deviceType, NotificationTargetType targetType, int expiry = 0)
+		public PushingSenderSettings(PushingType type, PushingDeviceType deviceType, PushingTargetType targetType, int expiry = 0)
 		{
 			_expiry = expiry < 0 ? 60 * 72 : expiry;
 			_type = type;
@@ -77,7 +77,7 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		/// <summary>
 		/// 获取或设置移动推送的类型（消息或通知），默认值为消息(Message)。
 		/// </summary>
-		public NotificationType Type
+		public PushingType Type
 		{
 			get
 			{
@@ -92,7 +92,7 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		/// <summary>
 		/// 获取或设置移动推送的设备类型，默认值为所有(All)。
 		/// </summary>
-		public NotificationDeviceType DeviceType
+		public PushingDeviceType DeviceType
 		{
 			get
 			{
@@ -107,7 +107,7 @@ namespace Zongsoft.Externals.Aliyun.Notification
 		/// <summary>
 		/// 获取或设置移动推送的目标（即推送方式）。
 		/// </summary>
-		public NotificationTargetType TargetType
+		public PushingTargetType TargetType
 		{
 			get
 			{

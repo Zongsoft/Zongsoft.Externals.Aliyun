@@ -33,8 +33,6 @@ using System.Threading.Tasks;
 using System.Xml;
 
 using Zongsoft.Messaging;
-using Zongsoft.Communication;
-using Zongsoft.Communication.Composition;
 
 namespace Zongsoft.Externals.Aliyun.Messaging
 {
@@ -42,6 +40,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 	{
 		#region 常量定义
 		private readonly string MESSAGE_SEND_URL;
+
 		private const string MESSAGE_CONTENT_TEMPLATE = @"<?xml version=""1.0"" encoding=""utf-8""?><Message xmlns=""http://mns.aliyuncs.com/doc/v1/""><MessageBody>{0}</MessageBody><MessageTag>{1}</MessageTag><MessageAttributes>{2}</MessageAttributes></Message>";
 		#endregion
 
@@ -49,22 +48,23 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		private string _name;
 		private TopicProvider _provider;
 		private TopicInfo _info;
+		private HttpClient _http;
 		private TopicSubscription _subscription;
 		#endregion
 
 		#region 构造函数
-		public Topic(TopicProvider provider, string name, TopicInfo info)
+		public Topic(TopicProvider provider, string name, TopicInfo info, HttpClient http = null)
 		{
 			if(string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			if(provider == null)
-				throw new ArgumentNullException(nameof(provider));
-
 			_name = name.Trim();
-			_provider = provider;
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 			_info = info;
 
+			_http = http ?? provider.GetHttpClient(_name);
+
+			//初始化相关操作的URL常量
 			MESSAGE_SEND_URL = provider.GetRequestUrl(_name, "messages");
 		}
 		#endregion
@@ -77,14 +77,6 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 				return _name;
 			}
 		}
-
-		public TopicProvider Provider
-		{
-			get
-			{
-				return _provider;
-			}
-		}
 		#endregion
 
 		#region 公共方法
@@ -92,7 +84,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		{
 			if(refresh || _info == null)
 			{
-				var response = _provider.Http.GetAsync(MESSAGE_SEND_URL);
+				var response = _http.GetAsync(MESSAGE_SEND_URL);
 
 				if(response.Result.IsSuccessStatusCode)
 					_info = MessageUtility.ResolveTopicInfo(response.Result.Content.ReadAsStreamAsync().Result);
@@ -141,7 +133,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 					throw new ArgumentOutOfRangeException(nameof(count));
 			}
 
-			var response = _provider.Http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(data, offset, count, tags, state));
+			var response = _http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(data, offset, count, tags, state));
 
 			return this.GetMessageResponseId(response.Result.Content.ReadAsStreamAsync().Result);
 		}
@@ -151,7 +143,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(stream == null)
 				return null;
 
-			var response = _provider.Http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(stream, tags, state));
+			var response = _http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(stream, tags, state));
 
 			return this.GetMessageResponseId(response.Result.Content.ReadAsStreamAsync().Result);
 		}
@@ -177,7 +169,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 					throw new ArgumentOutOfRangeException(nameof(count));
 			}
 
-			var response = await _provider.Http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(data, offset, count, tags, state));
+			var response = await _http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(data, offset, count, tags, state));
 			var content = await response.Content.ReadAsStreamAsync();
 			return Task.FromResult(this.GetMessageResponseId(content));
 		}
@@ -187,7 +179,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(stream == null)
 				return null;
 
-			var response = await _provider.Http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(stream, tags, state));
+			var response = await _http.PostAsync(MESSAGE_SEND_URL, this.CreateMessageRequest(stream, tags, state));
 			var content = await response.Content.ReadAsStreamAsync();
 			return this.GetMessageResponseId(content);
 		}

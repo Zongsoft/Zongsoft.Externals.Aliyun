@@ -46,13 +46,10 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#endregion
 
 		#region 构造函数
-		public Message(MessageQueue queue, string id, byte[] data, byte[] checksum = null, System.DateTime? expires = null, System.DateTime? enqueuedTime = null, System.DateTime? dequeuedTime = null, int dequeuedCount = 0)
+		public Message(MessageQueue queue, string id, byte[] data, byte[] checksum = null, DateTime? expires = null, DateTime? enqueuedTime = null, DateTime? dequeuedTime = null, int dequeuedCount = 0)
 			: base(id, data, checksum, expires, enqueuedTime, dequeuedTime, dequeuedCount)
 		{
-			if(queue == null)
-				throw new ArgumentNullException("queue");
-
-			_queue = queue;
+			_queue = queue ?? throw new ArgumentNullException(nameof(queue));
 		}
 		#endregion
 

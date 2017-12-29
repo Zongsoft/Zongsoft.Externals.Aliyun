@@ -26,60 +26,27 @@
 
 using System;
 
-namespace Zongsoft.Externals.Aliyun.Notification
+namespace Zongsoft.Externals.Aliyun.Sms
 {
-	public class NotificationServiceCenter : ServiceCenter
+	public class SmsServiceCenter : ServiceCenterBase
 	{
 		#region 单例字段
-		public static readonly NotificationServiceCenter Beijing = new NotificationServiceCenter(ServiceCenterName.Beijing);
-		public static readonly NotificationServiceCenter Qingdao = new NotificationServiceCenter(ServiceCenterName.Qingdao);
-		public static readonly NotificationServiceCenter Hangzhou = new NotificationServiceCenter(ServiceCenterName.Hangzhou);
-		public static readonly NotificationServiceCenter Shenzhen = new NotificationServiceCenter(ServiceCenterName.Shenzhen);
-		public static readonly NotificationServiceCenter Hongkong = new NotificationServiceCenter(ServiceCenterName.Hongkong);
-		#endregion
-
-		#region 成员字段
-		private string _region;
+		public static readonly SmsServiceCenter Beijing = new SmsServiceCenter(ServiceCenterName.Beijing);
+		public static readonly SmsServiceCenter Qingdao = new SmsServiceCenter(ServiceCenterName.Qingdao);
+		public static readonly SmsServiceCenter Hangzhou = new SmsServiceCenter(ServiceCenterName.Hangzhou);
+		public static readonly SmsServiceCenter Shenzhen = new SmsServiceCenter(ServiceCenterName.Shenzhen);
+		public static readonly SmsServiceCenter Hongkong = new SmsServiceCenter(ServiceCenterName.Hongkong);
 		#endregion
 
 		#region 构造函数
-		private NotificationServiceCenter(ServiceCenterName name) : base(name, false)
+		private SmsServiceCenter(ServiceCenterName name) : base(name, false)
 		{
-			this.Path = "cloudpush.aliyuncs.com";
-
-			switch(name)
-			{
-				case ServiceCenterName.Beijing:
-					_region = "cn-beijing";
-					break;
-				case ServiceCenterName.Qingdao:
-					_region = "cn-qingdao";
-					break;
-				case ServiceCenterName.Hangzhou:
-					_region = "cn-hangzhou";
-					break;
-				case ServiceCenterName.Shenzhen:
-					_region = "cn-shenzhen";
-					break;
-				case ServiceCenterName.Hongkong:
-					_region = "cn-hongkong";
-					break;
-			}
-		}
-		#endregion
-
-		#region 公共属性
-		public string Region
-		{
-			get
-			{
-				return _region;
-			}
+			this.Path = "dysmsapi.aliyuncs.com";
 		}
 		#endregion
 
 		#region 静态方法
-		public static NotificationServiceCenter GetInstance(ServiceCenterName name)
+		public static SmsServiceCenter GetInstance(ServiceCenterName name)
 		{
 			switch(name)
 			{

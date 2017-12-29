@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Zongsoft.IO;
 using Zongsoft.Externals.Aliyun;
@@ -27,7 +24,7 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 		public StorageFileSystemTests()
 		{
 			var configuration = Zongsoft.Options.Configuration.OptionConfiguration.Load(@"\Zongsoft\Zongsoft.Externals.Aliyun\src\Zongsoft.Externals.Aliyun.option");
-			var option = configuration.GetOptionValue("Externals/Aliyun/General") as Zongsoft.Externals.Aliyun.Options.Configuration.GeneralConfiguration;
+			var option = configuration.GetOptionValue("Externals/Aliyun/OSS") as Zongsoft.Externals.Aliyun.Storages.Options.IConfiguration;
 
 			var fileSystem = new StorageFileSystem(option);
 			Zongsoft.IO.FileSystem.Providers.Register(fileSystem, typeof(Zongsoft.IO.IFileSystem));

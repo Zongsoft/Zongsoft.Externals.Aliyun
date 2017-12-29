@@ -25,36 +25,36 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Options
+namespace Zongsoft.Externals.Aliyun.Messaging.Options
 {
 	/// <summary>
-	/// 表示阿里云的常规配置接口。
+	/// 表示阿里云消息服务的配置接口。
 	/// </summary>
 	public interface IConfiguration
 	{
 		/// <summary>
-		/// 获取或设置配置的服务中心。
+		/// 获取或设置消息服务的访问标识。
 		/// </summary>
-		ServiceCenterName Name
+		string Name
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 获取或设置一个值，指示是否为内网访问。
+		/// 获取消息队列提供程序的配置项。
 		/// </summary>
-		bool IsInternal
+		IQueueProviderOption Queues
 		{
 			get;
-			set;
 		}
 
 		/// <summary>
-		/// 获取阿里云的凭证提供程序。
+		/// 获取消息主题提供程序的配置项。
 		/// </summary>
-		ICertificateProvider Certificates
+		ITopicProviderOption Topics
 		{
 			get;
 		}

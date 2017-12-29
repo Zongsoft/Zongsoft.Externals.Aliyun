@@ -12,27 +12,35 @@
 		</assemblies>
 	</manifest>
 
-	<extension path="/Workbench/FileSystem">
-		<object name="Aliyun-OSS" configuration="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
+	<extension path="/Workspace/Externals/Aliyun">
+		<object name="OSS" configuration="{opt:/Externals/Aliyun/OSS}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
+		<object name="Queues" configuration="{opt:/Externals/Aliyun/Messaging.Queues}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
+		<object name="Topics" configuration="{opt:/Externals/Aliyun/Messaging.Topics}" type="Zongsoft.Externals.Aliyun.Messaging.TopicProvider, Zongsoft.Externals.Aliyun" />
+		<object name="SmsSender" configuration="{opt:/Externals/Aliyun/Sms}" type="Zongsoft.Externals.Aliyun.Sms.SmsSender, Zongsoft.Externals.Aliyun" />
+		<object name="PushingSender" configuration="{opt:/Externals/Aliyun/Pushing}" type="Zongsoft.Externals.Aliyun.Pushing.PushingSender, Zongsoft.Externals.Aliyun" />
 	</extension>
 
-	<extension path="/Workspace/Notification">
-		<object name="Sender" configuration="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Notification.NotificationSender, Zongsoft.Externals.Aliyun" />
+	<extension path="/Workbench/FileSystem">
+		<object name="AliyunOSS" value="{path:/Workspace/Externals/Aliyun/OSS}" />
 	</extension>
 
 	<extension path="/Workspace/Messaging">
-		<object name="Queues" configuration="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
-		<object name="Topics" configuration="{opt:/Externals/Aliyun/General}" type="Zongsoft.Externals.Aliyun.Messaging.TopicProvider, Zongsoft.Externals.Aliyun" />
+		<object name="Queues" value="{path:/Workspace/Externals/Aliyun/Queues}" />
+		<object name="Topics" value="{path:/Workspace/Externals/Aliyun/Topics}" />
 	</extension>
 
 	<extension path="/Workspace/Services">
-		<object name="MessageQueueProvider" value="{path:/Workspace/Messaging/Queues}" />
-		<object name="MessageTopicProvider" value="{path:/Workspace/Messaging/Topics}" />
+		<object name="MessageQueueProvider" value="{path:/Workspace/Externals/Aliyun/Queues}" />
+		<object name="MessageTopicProvider" value="{path:/Workspace/Externals/Aliyun/Topics}" />
 	</extension>
 
 	<extension path="/Workbench/Executor/Commands">
-		<object name="Notification">
-			<object name="Send" sender="{path:/Workspace/Notification/Sender}" type="Zongsoft.Externals.Aliyun.Notification.NotificationSendCommand, Zongsoft.Externals.Aliyun" />
+		<object name="Sms">
+			<object name="Send" sender="{path:/Workspace/Externals/Aliyun/SmsSender}" type="Zongsoft.Externals.Aliyun.Sms.SmsSendCommand, Zongsoft.Externals.Aliyun" />
+		</object>
+
+		<object name="Pushing">
+			<object name="Send" sender="{path:/Workspace/Externals/Aliyun/PushingSender}" type="Zongsoft.Externals.Aliyun.Pushing.PushingSendCommand, Zongsoft.Externals.Aliyun" />
 		</object>
 	</extension>
 </plugin>
