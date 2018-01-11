@@ -14,8 +14,8 @@
 
 	<extension path="/Workspace/Externals/Aliyun">
 		<object name="OSS" configuration="{opt:/Externals/Aliyun/OSS}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
-		<object name="Queues" configuration="{opt:/Externals/Aliyun/Messaging.Queues}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
-		<object name="Topics" configuration="{opt:/Externals/Aliyun/Messaging.Topics}" type="Zongsoft.Externals.Aliyun.Messaging.TopicProvider, Zongsoft.Externals.Aliyun" />
+		<object name="Queues" configuration="{opt:/Externals/Aliyun/Messaging}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
+		<object name="Topics" configuration="{opt:/Externals/Aliyun/Messaging}" type="Zongsoft.Externals.Aliyun.Messaging.TopicProvider, Zongsoft.Externals.Aliyun" />
 		<object name="SmsSender" configuration="{opt:/Externals/Aliyun/Sms}" type="Zongsoft.Externals.Aliyun.Sms.SmsSender, Zongsoft.Externals.Aliyun" />
 		<object name="PushingSender" configuration="{opt:/Externals/Aliyun/Pushing}" type="Zongsoft.Externals.Aliyun.Pushing.PushingSender, Zongsoft.Externals.Aliyun" />
 	</extension>
