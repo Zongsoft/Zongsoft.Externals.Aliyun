@@ -89,7 +89,10 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		internal ICertificate GetCertificate(string name)
 		{
 			var configuration = this.EnsureConfiguration();
-			var certificate = configuration.Queues.Get(name, false)?.Certificate;
+			var certificate = string.Empty;
+
+			if(configuration.Queues.TryGet(name, out var option))
+				certificate = option.Certificate;
 
 			if(string.IsNullOrWhiteSpace(certificate))
 				certificate = configuration.Queues.Certificate;
@@ -97,14 +100,17 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			if(string.IsNullOrWhiteSpace(certificate))
 				return Aliyun.Configuration.Instance.Certificates.Default;
 
-			return Aliyun.Configuration.Instance.Certificates.Get(certificate, true);
+			return Aliyun.Configuration.Instance.Certificates.Get(certificate);
 		}
 
 		internal string GetRequestUrl(string queueName, params string[] parts)
 		{
 			var configuration = this.EnsureConfiguration();
-			var option = configuration.Queues.Get(queueName, false);
-			var region = option?.Region ?? configuration.Queues.Region ?? Aliyun.Configuration.Instance.Name;
+			var region = configuration.Queues.Region ?? Aliyun.Configuration.Instance.Name;
+
+			if(configuration.Queues.TryGet(queueName, out var option) && option.Region.HasValue)
+				region = option.Region.Value;
+
 			var center = ServiceCenter.GetInstance(region, Aliyun.Configuration.Instance.IsInternal);
 
 			var path = parts == null ? string.Empty : string.Join("/", parts);

@@ -35,7 +35,7 @@ using Zongsoft.IO;
 
 namespace Zongsoft.Externals.Aliyun.Storages
 {
-	[Zongsoft.Services.Matcher(typeof(Zongsoft.IO.FileSystem.Matcher))]
+	[Zongsoft.Collections.Matcher(typeof(Zongsoft.IO.FileSystem.Matcher))]
 	public class StorageFileSystem : Zongsoft.IO.IFileSystem
 	{
 		#region 成员字段
@@ -122,7 +122,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			var configuration = this.EnsureConfiguration();
 
 			//获取当前路径对应的存储器配置项，注：BucketName即为路径中的第一节
-			var bucket = configuration.Buckets.Get(path.Segments[0], false);
+			configuration.Buckets.TryGet(path.Segments[0], out var bucket);
 
 			//获取当前路径对应的服务区域
 			var region = this.GetRegion(bucket);
@@ -150,7 +150,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			var configuration = this.EnsureConfiguration();
 
 			//获取指定名称的存储器配置项
-			var bucket = configuration.Buckets.Get(bucketName, false);
+			configuration.Buckets.TryGet(bucketName, out var bucket);
 
 			var region = this.GetRegion(bucket);
 			var center = StorageServiceCenter.GetInstance(region, Aliyun.Configuration.Instance.IsInternal);
@@ -171,7 +171,7 @@ namespace Zongsoft.Externals.Aliyun.Storages
 			if(string.IsNullOrWhiteSpace(certificate))
 				return Aliyun.Configuration.Instance.Certificates.Default;
 
-			return Aliyun.Configuration.Instance.Certificates.Get(certificate, true);
+			return Aliyun.Configuration.Instance.Certificates.Get(certificate);
 		}
 
 		private ServiceCenterName GetRegion(Options.IBucketOption bucket)
