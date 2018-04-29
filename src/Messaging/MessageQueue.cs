@@ -26,21 +26,18 @@
 
 using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System.Net.Http.Headers;
 
 namespace Zongsoft.Externals.Aliyun.Messaging
 {
 	public class MessageQueue : Zongsoft.Messaging.MessageQueueBase
 	{
 		#region 常量定义
-		private static readonly Regex _count_regex = new Regex(@"\<(?'tag'(ActiveMessages|InactiveMessages|DelayMessages))\>\s*(?<value>[^<>\s]+)\s*\<\/\k'tag'\>", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnorePatternWhitespace);
+		private static readonly Regex COUNT_REGEX = new Regex(@"\<(?'tag'(ActiveMessages|InactiveMessages|DelayMessages))\>\s*(?<value>[^<>\s]+)\s*\<\/\k'tag'\>", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.IgnorePatternWhitespace);
 		#endregion
 
 		#region 成员字段
@@ -72,17 +69,17 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 			var response = await _http.GetAsync(this.GetRequestUrl());
 
 			if(!response.IsSuccessStatusCode)
-				return 0;
+				return -1;
 
 			var content = await response.Content.ReadAsStringAsync();
 
 			if(string.IsNullOrWhiteSpace(content))
-				return 0;
+				return -1;
 
-			var matches = _count_regex.Matches(content);
+			var matches = COUNT_REGEX.Matches(content);
 
 			if(matches == null || matches.Count < 1)
-				return 0;
+				return -1;
 
 			long total = 0;
 
@@ -284,13 +281,7 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#region 内部方法
 		internal string GetRequestUrl(params string[] parts)
 		{
-			var args = (parts == null ? new string[1] : new string[parts.Length + 1]);
-			args[0] = this.Name;
-
-			if(parts != null && parts.Length > 0)
-				Array.Copy(parts, 0, args, 1, parts.Length);
-
-			return _provider.GetRequestUrl(this.Name, args);
+			return _provider.GetRequestUrl(this.Name, parts);
 		}
 		#endregion
 	}
