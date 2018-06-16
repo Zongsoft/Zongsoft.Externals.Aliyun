@@ -35,7 +35,6 @@ using Zongsoft.IO;
 
 namespace Zongsoft.Externals.Aliyun.Storages
 {
-	[Zongsoft.Collections.Matcher(typeof(Zongsoft.IO.FileSystem.Matcher))]
 	public class StorageFileSystem : Zongsoft.IO.IFileSystem
 	{
 		#region 成员字段

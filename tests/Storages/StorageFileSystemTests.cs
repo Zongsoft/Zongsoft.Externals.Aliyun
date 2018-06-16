@@ -27,7 +27,7 @@ namespace Zongsoft.Externals.Aliyun.Tests.Storages
 			var option = configuration.GetOptionValue("Externals/Aliyun/OSS") as Zongsoft.Externals.Aliyun.Storages.Options.IConfiguration;
 
 			var fileSystem = new StorageFileSystem(option);
-			Zongsoft.IO.FileSystem.Providers.Register(fileSystem, typeof(Zongsoft.IO.IFileSystem));
+			Zongsoft.IO.FileSystem.Providers.Add(fileSystem);
 		}
 		#endregion
 
