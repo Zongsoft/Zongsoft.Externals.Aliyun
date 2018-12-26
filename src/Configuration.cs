@@ -47,7 +47,7 @@ namespace Zongsoft.Externals.Aliyun
 			{
 				if(_instance == null)
 				{
-					_instance = Zongsoft.Options.OptionManager.Default.GetOptionValue("/Externals/Aliyun/General") as Options.IConfiguration;
+					_instance = Zongsoft.Options.OptionManager.Instance.GetOptionValue("/Externals/Aliyun/General") as Options.IConfiguration;
 
 					if(_instance == null)
 						throw new InvalidOperationException("Missing required configuation of the Aliyun.");
