@@ -41,7 +41,8 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		#region 常量定义
 		private readonly string MESSAGE_SEND_URL;
 
-		private const string MESSAGE_CONTENT_TEMPLATE = @"<?xml version=""1.0"" encoding=""utf-8""?><Message xmlns=""http://mns.aliyuncs.com/doc/v1/""><MessageBody>{0}</MessageBody><MessageTag>{1}</MessageTag><MessageAttributes>{2}</MessageAttributes></Message>";
+		private const string MESSAGE_CONTENT_NOTAG_TEMPLATE = @"<?xml version=""1.0"" encoding=""utf-8""?><Message xmlns=""http://mns.aliyuncs.com/doc/v1/""><MessageBody>{0}</MessageBody><MessageAttributes>{1}</MessageAttributes></Message>";
+		private const string MESSAGE_CONTENT_FULLY_TEMPLATE = @"<?xml version=""1.0"" encoding=""utf-8""?><Message xmlns=""http://mns.aliyuncs.com/doc/v1/""><MessageBody>{0}</MessageBody><MessageTag>{1}</MessageTag><MessageAttributes>{2}</MessageAttributes></Message>";
 		#endregion
 
 		#region 成员字段
@@ -208,16 +209,27 @@ namespace Zongsoft.Externals.Aliyun.Messaging
 		private HttpContent CreateMessageRequest(byte[] data, int offset, int count, string tags, object state)
 		{
 			var content = System.Convert.ToBase64String(data, offset, count);
-			return new StringContent(string.Format(MESSAGE_CONTENT_TEMPLATE, content, tags, this.GenerateStateEntity(state)), Encoding.UTF8, "application/xml");
+
+			if(string.IsNullOrWhiteSpace(tags))
+				content = string.Format(MESSAGE_CONTENT_NOTAG_TEMPLATE, content, this.GenerateStateEntity(state));
+			else
+				content = string.Format(MESSAGE_CONTENT_FULLY_TEMPLATE, content, tags, this.GenerateStateEntity(state));
+
+			return new StringContent(content, Encoding.UTF8, "application/xml");
 		}
 
 		public HttpContent CreateMessageRequest(Stream stream, string tags, object state)
 		{
 			var buffer = new byte[stream.Length - stream.Position];
 			stream.Read(buffer, 0, buffer.Length);
-
 			var content = System.Convert.ToBase64String(buffer);
-			return new StringContent(string.Format(MESSAGE_CONTENT_TEMPLATE, content, tags, this.GenerateStateEntity(state)), Encoding.UTF8, "application/xml");
+
+			if(string.IsNullOrWhiteSpace(tags))
+				content = string.Format(MESSAGE_CONTENT_NOTAG_TEMPLATE, content, this.GenerateStateEntity(state));
+			else
+				content = string.Format(MESSAGE_CONTENT_FULLY_TEMPLATE, content, tags, this.GenerateStateEntity(state));
+
+			return new StringContent(content, Encoding.UTF8, "application/xml");
 		}
 
 		private string GetMessageResponseId(Stream stream)
