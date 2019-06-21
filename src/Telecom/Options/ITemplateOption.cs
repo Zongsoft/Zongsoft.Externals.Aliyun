@@ -27,7 +27,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Sms.Options
+namespace Zongsoft.Externals.Aliyun.Telecom.Options
 {
 	/// <summary>
 	/// 表示短信模板的配置项接口。
@@ -57,24 +57,6 @@ namespace Zongsoft.Externals.Aliyun.Sms.Options
 		/// 获取或设置模板的方案（即阿里云的短信签名）。
 		/// </summary>
 		string Scheme
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取或设置模板所属的运营商区域。
-		/// </summary>
-		ServiceCenterName? Region
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 获取或设置模板关联的凭证名。
-		/// </summary>
-		string Certificate
 		{
 			get;
 			set;

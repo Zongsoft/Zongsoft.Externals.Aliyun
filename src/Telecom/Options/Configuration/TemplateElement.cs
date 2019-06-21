@@ -25,44 +25,59 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Sms
+using Zongsoft.Options;
+using Zongsoft.Options.Configuration;
+
+namespace Zongsoft.Externals.Aliyun.Telecom.Options.Configuration
 {
-	public class SmsServiceCenter : ServiceCenterBase
+	public class TemplateElement : OptionConfigurationElement, ITemplateOption
 	{
-		#region 单例字段
-		public static readonly SmsServiceCenter Beijing = new SmsServiceCenter(ServiceCenterName.Beijing);
-		public static readonly SmsServiceCenter Qingdao = new SmsServiceCenter(ServiceCenterName.Qingdao);
-		public static readonly SmsServiceCenter Hangzhou = new SmsServiceCenter(ServiceCenterName.Hangzhou);
-		public static readonly SmsServiceCenter Shenzhen = new SmsServiceCenter(ServiceCenterName.Shenzhen);
-		public static readonly SmsServiceCenter Hongkong = new SmsServiceCenter(ServiceCenterName.Hongkong);
+		#region 常量定义
+		private const string XML_NAME_ATTRIBUTE = "name";
+		private const string XML_CODE_ATTRIBUTE = "code";
+		private const string XML_SCHEME_ATTRIBUTE = "scheme";
 		#endregion
 
-		#region 构造函数
-		private SmsServiceCenter(ServiceCenterName name) : base(name, false)
+		#region 公共属性
+		[OptionConfigurationProperty(XML_NAME_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsKey)]
+		public string Name
 		{
-			this.Path = "dysmsapi.aliyuncs.com";
-		}
-		#endregion
-
-		#region 静态方法
-		public static SmsServiceCenter GetInstance(ServiceCenterName name)
-		{
-			switch(name)
+			get
 			{
-				case ServiceCenterName.Beijing:
-					return Beijing;
-				case ServiceCenterName.Qingdao:
-					return Qingdao;
-				case ServiceCenterName.Hangzhou:
-					return Hangzhou;
-				case ServiceCenterName.Shenzhen:
-					return Shenzhen;
-				case ServiceCenterName.Hongkong:
-					return Hongkong;
+				return (string)this[XML_NAME_ATTRIBUTE];
 			}
+			set
+			{
+				this[XML_NAME_ATTRIBUTE] = value;
+			}
+		}
 
-			return null;
+		[OptionConfigurationProperty(XML_CODE_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
+		public string Code
+		{
+			get
+			{
+				return (string)this[XML_CODE_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_CODE_ATTRIBUTE] = value;
+			}
+		}
+
+		[OptionConfigurationProperty(XML_SCHEME_ATTRIBUTE, OptionConfigurationPropertyBehavior.IsRequired)]
+		public string Scheme
+		{
+			get
+			{
+				return (string)this[XML_SCHEME_ATTRIBUTE];
+			}
+			set
+			{
+				this[XML_SCHEME_ATTRIBUTE] = value;
+			}
 		}
 		#endregion
 	}

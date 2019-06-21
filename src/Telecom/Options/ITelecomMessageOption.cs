@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -27,30 +27,19 @@
 using System;
 using System.Collections.Generic;
 
-using Zongsoft.Options;
-using Zongsoft.Options.Configuration;
-
-namespace Zongsoft.Externals.Aliyun.Sms.Options.Configuration
+namespace Zongsoft.Externals.Aliyun.Telecom.Options
 {
-	public class TemplateElementCollection : OptionConfigurationElementCollection<TemplateElement, ITemplateOption>
+	/// <summary>
+	/// 表示电信短信服务的配置接口。
+	/// </summary>
+	public interface ITelecomMessageOption
 	{
-		#region 常量定义
-		private const string XML_TEMPLATE_ELEMENT = "template";
-		#endregion
-
-		#region 重写方法
-		protected override string ElementName
+		/// <summary>
+		/// 获取短信模板配置项集合。
+		/// </summary>
+		Collections.INamedCollection<ITemplateOption> Templates
 		{
-			get
-			{
-				return XML_TEMPLATE_ELEMENT;
-			}
+			get;
 		}
-
-		protected override string GetElementKey(OptionConfigurationElement element)
-		{
-			return ((TemplateElement)element).Name;
-		}
-		#endregion
 	}
 }

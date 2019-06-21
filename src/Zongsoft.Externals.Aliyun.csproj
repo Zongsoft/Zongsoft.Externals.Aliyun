@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Zongsoft.Externals.Aliyun</RootNamespace>
     <AssemblyName>Zongsoft.Externals.Aliyun</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -88,16 +89,15 @@
     <Compile Include="Options\IConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceCenterBase.cs" />
-    <Compile Include="Sms\SmsServiceCenter.cs" />
-    <Compile Include="Sms\Options\Configuration\GeneralConfiguration.cs" />
-    <Compile Include="Sms\Options\Configuration\TemplateElement.cs" />
-    <Compile Include="Sms\Options\Configuration\TemplateElementCollection.cs" />
-    <Compile Include="Sms\Options\IConfiguration.cs" />
-    <Compile Include="Sms\SmsAuthenticator.cs" />
-    <Compile Include="Sms\SmsSendCommand.cs" />
-    <Compile Include="Sms\SmsSender.cs" />
-    <Compile Include="Sms\SmsSendResult.cs" />
-    <Compile Include="Sms\Options\ITemplateOption.cs" />
+    <Compile Include="Telecom\Options\ITelecomMessageOption.cs" />
+    <Compile Include="Telecom\Options\ITelecomVoiceOption.cs" />
+    <Compile Include="Telecom\Phone.cs" />
+    <Compile Include="Telecom\Options\Configuration\GeneralConfiguration.cs" />
+    <Compile Include="Telecom\Options\Configuration\TemplateElement.cs" />
+    <Compile Include="Telecom\Options\Configuration\TemplateElementCollection.cs" />
+    <Compile Include="Telecom\Options\IConfiguration.cs" />
+    <Compile Include="Telecom\PhoneAuthenticator.cs" />
+    <Compile Include="Telecom\Options\ITemplateOption.cs" />
     <Compile Include="Storages\Options\Configuration\GeneralConfiguration.cs" />
     <Compile Include="Storages\Options\Configuration\BucketElement.cs" />
     <Compile Include="Storages\Options\Configuration\BucketElementCollection.cs" />

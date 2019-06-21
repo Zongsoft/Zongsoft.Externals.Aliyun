@@ -25,44 +25,47 @@
  */
 
 using System;
-using System.Net.Http;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Sms
+namespace Zongsoft.Externals.Aliyun.Telecom.Options
 {
-	public class SmsAuthenticator : HttpAuthenticator
+	/// <summary>
+	/// 表示电信通讯相关的配置接口。
+	/// </summary>
+	public interface IConfiguration
 	{
-		#region 单例字段
-		public static SmsAuthenticator Instance = new SmsAuthenticator();
-		#endregion
-
-		#region 私有构造
-		private SmsAuthenticator() : base("Signature", HttpSignatureMode.Parameter)
+		/// <summary>
+		/// 获取或设置电信运营商区域。
+		/// </summary>
+		ServiceCenterName? Region
 		{
-		}
-		#endregion
-
-		#region 重写方法
-		public override string Signature(HttpRequestMessage request, string secret)
-		{
-			return base.Signature(request, secret + "&");
+			get;
+			set;
 		}
 
-		protected override string Canonicalize(HttpRequestMessage request)
+		/// <summary>
+		/// 获取或设置关联的凭证名。
+		/// </summary>
+		string Certificate
 		{
-			var canonicalizedString = base.Canonicalize(request);
-
-			return request.Method.Method + "&%2F&" + Uri.EscapeDataString(canonicalizedString);
+			get;
+			set;
 		}
 
-		protected override string CanonicalizeHeaders(HttpRequestMessage request)
+		/// <summary>
+		/// 获取电信短信服务配置。
+		/// </summary>
+		ITelecomMessageOption Message
 		{
-			return null;
+			get;
 		}
 
-		protected override string CanonicalizeResource(HttpRequestMessage request)
+		/// <summary>
+		/// 获取电信语音服务配置。
+		/// </summary>
+		ITelecomVoiceOption Voice
 		{
-			return this.CanonicalizeQuery(request.RequestUri, tx => tx.Replace("%7E", "~"));
+			get;
 		}
-		#endregion
 	}
 }

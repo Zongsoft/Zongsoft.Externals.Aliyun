@@ -17,10 +17,15 @@
 			<bucket name="The Bucket Name" region="The Service-Center-Name of The Bucket(e.g., Shenzhen)" certificate="" />
 		</oss>
 
-		<!-- 阿里云手机短信的配置项 -->
-		<sms region="Hangzhou" certificate="" sms.type="Zongsoft.Externals.Aliyun.Sms.Options.Configuration.GeneralConfiguration, Zongsoft.Externals.Aliyun">
-			<template name="authenticode" code="SMS_12345678" scheme="Your Signature Name of The SMS" />
-		</sms>
+		<!-- 阿里云电信服务的配置项 -->
+		<telecom region="Hangzhou" certificate="" telecom.type="Zongsoft.Externals.Aliyun.Telecom.Options.Configuration.GeneralConfiguration, Zongsoft.Externals.Aliyun">
+			<message>
+				<template name="Alarm" code="SMS_12345678" scheme="Your Signature of The SMS" />
+			</message>
+			<voice numbers="40012345678,40066668888">
+				<template name="Alarm" code="TTS_12345678" />
+			</voice>
+		</telecom>
 
 		<!-- 阿里云移动推送的配置项 -->
 		<pushing region="Hangzhou" certificate="" pushing.type="Zongsoft.Externals.Aliyun.Pushing.Options.Configuration.GeneralConfiguration, Zongsoft.Externals.Aliyun">

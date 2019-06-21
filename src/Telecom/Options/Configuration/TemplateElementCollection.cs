@@ -30,49 +30,26 @@ using System.Collections.Generic;
 using Zongsoft.Options;
 using Zongsoft.Options.Configuration;
 
-namespace Zongsoft.Externals.Aliyun.Sms.Options.Configuration
+namespace Zongsoft.Externals.Aliyun.Telecom.Options.Configuration
 {
-	public class GeneralConfiguration : OptionConfigurationElement, IConfiguration
+	public class TemplateElementCollection : OptionConfigurationElementCollection<TemplateElement, ITemplateOption>
 	{
 		#region 常量定义
-		private const string XML_REGION_ATTRIBUTE = "region";
-		private const string XML_CERTIFICATE_ATTRIBUTE = "certificate";
+		private const string XML_TEMPLATE_ELEMENT = "template";
 		#endregion
 
-		#region 公共属性
-		[OptionConfigurationProperty(XML_REGION_ATTRIBUTE, null)]
-		public ServiceCenterName? Region
+		#region 重写方法
+		protected override string ElementName
 		{
 			get
 			{
-				return (ServiceCenterName?)this[XML_REGION_ATTRIBUTE];
-			}
-			set
-			{
-				this[XML_REGION_ATTRIBUTE] = value;
+				return XML_TEMPLATE_ELEMENT;
 			}
 		}
 
-		[OptionConfigurationProperty(XML_CERTIFICATE_ATTRIBUTE)]
-		public string Certificate
+		protected override string GetElementKey(OptionConfigurationElement element)
 		{
-			get
-			{
-				return (string)this[XML_CERTIFICATE_ATTRIBUTE];
-			}
-			set
-			{
-				this[XML_CERTIFICATE_ATTRIBUTE] = value;
-			}
-		}
-
-		[OptionConfigurationProperty("", Type = typeof(TemplateElementCollection))]
-		public Collections.INamedCollection<ITemplateOption> Templates
-		{
-			get
-			{
-				return (Collections.INamedCollection<ITemplateOption>)this[string.Empty];
-			}
+			return ((TemplateElement)element).Name;
 		}
 		#endregion
 	}

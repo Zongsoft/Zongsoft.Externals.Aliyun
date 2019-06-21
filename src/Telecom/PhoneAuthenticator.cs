@@ -25,39 +25,44 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Net.Http;
 
-namespace Zongsoft.Externals.Aliyun.Sms.Options
+namespace Zongsoft.Externals.Aliyun.Telecom
 {
-	/// <summary>
-	/// 表示手机短信相关的配置接口。
-	/// </summary>
-	public interface IConfiguration
+	public class PhoneAuthenticator : HttpAuthenticator
 	{
-		/// <summary>
-		/// 获取或设置手机短信运营商区域。
-		/// </summary>
-		ServiceCenterName? Region
+		#region 单例字段
+		public static PhoneAuthenticator Instance = new PhoneAuthenticator();
+		#endregion
+
+		#region 私有构造
+		private PhoneAuthenticator() : base("Signature", HttpSignatureMode.Parameter)
 		{
-			get;
-			set;
+		}
+		#endregion
+
+		#region 重写方法
+		public override string Signature(HttpRequestMessage request, string secret)
+		{
+			return base.Signature(request, secret + "&");
 		}
 
-		/// <summary>
-		/// 获取或设置关联的凭证名。
-		/// </summary>
-		string Certificate
+		protected override string Canonicalize(HttpRequestMessage request)
 		{
-			get;
-			set;
+			var canonicalizedString = base.Canonicalize(request);
+
+			return request.Method.Method + "&%2F&" + Uri.EscapeDataString(canonicalizedString);
 		}
 
-		/// <summary>
-		/// 获取短信模板配置项集合。
-		/// </summary>
-		Collections.INamedCollection<ITemplateOption> Templates
+		protected override string CanonicalizeHeaders(HttpRequestMessage request)
 		{
-			get;
+			return null;
 		}
+
+		protected override string CanonicalizeResource(HttpRequestMessage request)
+		{
+			return this.CanonicalizeQuery(request.RequestUri, tx => tx.Replace("%7E", "~"));
+		}
+		#endregion
 	}
 }

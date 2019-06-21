@@ -1,8 +1,8 @@
 ﻿/*
  * Authors:
- *   钟峰(Popeye Zhong) <zongsoft@gmail.com>
+ *   钟峰(Popeye Zhong) <zongsoft@qq.com>
  *
- * Copyright (C) 2015-2017 Zongsoft Corporation <http://www.zongsoft.com>
+ * Copyright (C) 2015-2019 Zongsoft Corporation <http://www.zongsoft.com>
  *
  * This file is part of Zongsoft.Externals.Aliyun.
  *
@@ -25,47 +25,29 @@
  */
 
 using System;
+using System.Collections.Generic;
 
-namespace Zongsoft.Externals.Aliyun.Sms
+namespace Zongsoft.Externals.Aliyun.Telecom.Options
 {
 	/// <summary>
-	/// 表示短信发送后的结果类。
+	/// 表示电信语音服务的配置接口。
 	/// </summary>
-	public class SmsSendResult
+	public interface ITelecomVoiceOption
 	{
-		#region 成员字段
-		private string _code;
-		private string _message;
-		#endregion
-
-		#region 构造函数
-		public SmsSendResult()
+		/// <summary>
+		/// 获取或设置语音号码数组。
+		/// </summary>
+		string[] Numbers
 		{
+			get; set;
 		}
 
-		public SmsSendResult(string code, string message)
+		/// <summary>
+		/// 获取语音模板配置项集合。
+		/// </summary>
+		Collections.INamedCollection<ITemplateOption> Templates
 		{
-			_code = code;
-			_message = message;
+			get;
 		}
-		#endregion
-
-		#region 公共属性
-		public string Code
-		{
-			get
-			{
-				return _code;
-			}
-		}
-
-		public string Message
-		{
-			get
-			{
-				return _message;
-			}
-		}
-		#endregion
 	}
 }

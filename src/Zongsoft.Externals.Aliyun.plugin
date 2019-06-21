@@ -16,7 +16,7 @@
 		<object name="OSS" configuration="{opt:/Externals/Aliyun/OSS}" type="Zongsoft.Externals.Aliyun.Storages.StorageFileSystem, Zongsoft.Externals.Aliyun" />
 		<object name="Queues" configuration="{opt:/Externals/Aliyun/Messaging}" type="Zongsoft.Externals.Aliyun.Messaging.MessageQueueProvider, Zongsoft.Externals.Aliyun" />
 		<object name="Topics" configuration="{opt:/Externals/Aliyun/Messaging}" type="Zongsoft.Externals.Aliyun.Messaging.TopicProvider, Zongsoft.Externals.Aliyun" />
-		<object name="SmsSender" configuration="{opt:/Externals/Aliyun/Sms}" type="Zongsoft.Externals.Aliyun.Sms.SmsSender, Zongsoft.Externals.Aliyun" />
+		<object name="Phone" configuration="{opt:/Externals/Aliyun/Telecom}" type="Zongsoft.Externals.Aliyun.Telecom.Phone, Zongsoft.Externals.Aliyun" />
 		<object name="PushingSender" configuration="{opt:/Externals/Aliyun/Pushing}" type="Zongsoft.Externals.Aliyun.Pushing.PushingSender, Zongsoft.Externals.Aliyun" />
 	</extension>
 
@@ -35,8 +35,9 @@
 	</extension>
 
 	<extension path="/Workbench/Executor/Commands">
-		<object name="Sms">
-			<object name="Send" sender="{path:/Workspace/Externals/Aliyun/SmsSender}" type="Zongsoft.Externals.Aliyun.Sms.SmsSendCommand, Zongsoft.Externals.Aliyun" />
+		<object name="Phone">
+			<object name="Send" value="{path:/Workspace/Externals/Aliyun/Phone.Sender}" />
+			<object name="Call" value="{path:/Workspace/Externals/Aliyun/Phone.Caller}" />
 		</object>
 
 		<object name="Pushing">
