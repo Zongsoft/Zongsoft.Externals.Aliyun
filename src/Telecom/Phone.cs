@@ -31,7 +31,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 using Zongsoft.Services;
-using Zongsoft.Resources;
+using Zongsoft.Runtime.Serialization;
 
 namespace Zongsoft.Externals.Aliyun.Telecom
 {
@@ -141,7 +141,7 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 				if(parameter is string || parameter is System.Text.StringBuilder)
 					headers.Add("TtsParam", parameter.ToString());
 				else
-					headers.Add("TtsParam", Runtime.Serialization.Serializer.Json.Serialize(parameter));
+					headers.Add("TtsParam", Serializer.Json.Serialize(parameter, TextSerializationSettings.Camel));
 			}
 
 			if(!string.IsNullOrWhiteSpace(extra))
@@ -207,7 +207,7 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 				if(parameter is string || parameter is System.Text.StringBuilder)
 					headers.Add("TemplateParam", parameter.ToString());
 				else
-					headers.Add("TemplateParam", Runtime.Serialization.Serializer.Json.Serialize(parameter));
+					headers.Add("TemplateParam", Serializer.Json.Serialize(parameter, TextSerializationSettings.Camel));
 			}
 
 			if(!string.IsNullOrWhiteSpace(extra))
