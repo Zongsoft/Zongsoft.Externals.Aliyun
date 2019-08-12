@@ -157,6 +157,9 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 			//提交语音拨号请求
 			var response = await http.SendAsync(request);
 
+			//确认返回状态码是成功的
+			response.EnsureSuccessStatusCode();
+
 			return await this.GetResultAsync(response.Content);
 		}
 
@@ -222,6 +225,9 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 
 			//提交短信发送请求
 			var response = await http.SendAsync(request);
+
+			//确认返回状态码是成功的
+			response.EnsureSuccessStatusCode();
 
 			return await this.GetResultAsync(response.Content);
 		}
