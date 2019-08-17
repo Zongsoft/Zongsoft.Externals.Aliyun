@@ -138,7 +138,7 @@ namespace Zongsoft.Externals.Aliyun.Pushing
 				{ "AccessKeyId", this.GetCertificate(app).Name },
 				{ "SignatureMethod", "HMAC-SHA1" },
 				{ "SignatureVersion", "1.0" },
-				{ "SignatureNonce", ((ulong)Zongsoft.Common.RandomGenerator.GenerateInt64()).ToString() },
+				{ "SignatureNonce", ((ulong)Zongsoft.Common.Randomizer.GenerateInt64()).ToString() },
 				{ "Timestamp", Utility.GetTimestamp() },
 
 				//以下是推送接口特定参数

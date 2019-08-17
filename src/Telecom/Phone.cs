@@ -119,7 +119,7 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 			var caller = configuration.Voice.Numbers[0];
 
 			if(configuration.Voice.Numbers.Length > 1)
-				caller = configuration.Voice.Numbers[Common.RandomGenerator.GenerateInt32() % configuration.Voice.Numbers.Length];
+				caller = configuration.Voice.Numbers[Common.Randomizer.GenerateInt32() % configuration.Voice.Numbers.Length];
 
 			//获取指定名称的语音模板配置，如果获取失败则抛出异常
 			if(!configuration.Message.Templates.TryGet(name, out var template))
