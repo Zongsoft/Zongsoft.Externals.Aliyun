@@ -169,9 +169,10 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 		/// <param name="name">指定的短信模板名称。</param>
 		/// <param name="destinations">目标手机号码集。</param>
 		/// <param name="parameter">短信模板参数对象。</param>
+		/// <param name="scheme">短信签名，如果为空或空字符串则使用指定模板中的签名。</param>
 		/// <param name="extra">扩展附加数据，通常表示特定的业务数据。</param>
 		/// <returns>返回的短信发送结果信息。</returns>
-		public async Task<Result> SendAsync(string name, IEnumerable<string> destinations, object parameter, string extra = null)
+		public async Task<Result> SendAsync(string name, IEnumerable<string> destinations, object parameter, string scheme = null, string extra = null)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -202,7 +203,7 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 
 			//添加必须的短信服务参数
 			headers.Add("TemplateCode", template.Code);
-			headers.Add("SignName", template.Scheme);
+			headers.Add("SignName", string.IsNullOrWhiteSpace(scheme) ? template.Scheme : scheme);
 			headers.Add("PhoneNumbers", target);
 
 			if(parameter != null)
@@ -357,12 +358,14 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 		#region 命令子类
 		[CommandOption(KEY_TEMPLATE_OPTION, typeof(string), null, true, "Text.PhoneSendCommand.Options.Template")]
 		[CommandOption(KEY_PARAMETER_OPTION, typeof(string), null, false, "Text.PhoneSendCommand.Options.Parameter")]
+		[CommandOption(KEY_SCHEME_OPTION, typeof(string), null, false, "Text.PhoneSendCommand.Options.Scheme")]
 		[CommandOption(KEY_EXTRA_OPTION, typeof(string), null, false, "Text.PhoneSendCommand.Options.Extra")]
 		private class PhoneSendCommand : CommandBase<CommandContext>
 		{
 			#region 常量定义
 			private const string KEY_TEMPLATE_OPTION = "template";
 			private const string KEY_PARAMETER_OPTION = "parameter";
+			private const string KEY_SCHEME_OPTION = "scheme";
 			private const string KEY_EXTRA_OPTION = "extra";
 			#endregion
 
@@ -387,6 +390,7 @@ namespace Zongsoft.Externals.Aliyun.Telecom
 					context.Expression.Options.GetValue<string>(KEY_TEMPLATE_OPTION),
 					context.Expression.Arguments,
 					context.Parameter ?? Phone.GetDictionary(context.Expression.Options.GetValue<string>(KEY_PARAMETER_OPTION)),
+					context.Expression.Options.GetValue<string>(KEY_SCHEME_OPTION),
 					context.Expression.Options.GetValue<string>(KEY_EXTRA_OPTION)));
 
 				return result;
