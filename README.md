@@ -5,5 +5,7 @@
 README: [English](https://github.com/Zongsoft/Zongsoft.Externals.Aliyun/blob/master/README.md) | [简体中文](https://github.com/Zongsoft/Zongsoft.Externals.Aliyun/blob/master/README-zh_CN.md)
 
 -----
+注：该项目已归档，对应的替代版本请参考：https://github.com/Zongsoft/Framework/blob/master/externals/aliyun
+-----
 
 关于阿里云服务的扩展开发包。
